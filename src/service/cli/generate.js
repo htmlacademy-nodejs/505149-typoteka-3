@@ -1,6 +1,7 @@
 'use strict';
 
 const chalk = require(`chalk`);
+const Intl = require(`intl`);
 const fs = require(`fs`).promises;
 const {getRandomInt, shuffle} = require(`../../utils`);
 
@@ -75,7 +76,7 @@ const generateOffers = (count) => (
     title: TITLES[getRandomInt(0, TITLES.length - 1)],
     announce: shuffle(SENTENCES).slice(0, getRandomInt(1, 5)).join(` `),
     fullText: shuffle(SENTENCES).slice(0, getRandomInt(1, SENTENCES.length - 1)).join(` `),
-    createdDate: new Date(getRandomInt(DateRestrict.min, DateRestrict.max)).toLocaleString(),
+    createdDate: new Intl.DateTimeFormat(`ru-Ru`, {day: `numeric`, month: `numeric`, year: `numeric`, hour: `numeric`, minute: `numeric`, second: `numeric`}).format(new Date(getRandomInt(DateRestrict.min, DateRestrict.max))),
     category: shuffle(CATEGORIES).slice(0, getRandomInt(1, CATEGORIES.length - 1)),
   }))
 );
