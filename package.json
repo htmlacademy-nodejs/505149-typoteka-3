@@ -23,6 +23,7 @@
     "eslint-config-htmlacademy": "0.5.2"
   },
   "dependencies": {
+    "chalk": "3.0.0",
     "intl": "^1.2.5"
   }
 }
