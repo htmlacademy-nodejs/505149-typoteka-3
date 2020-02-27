@@ -7,6 +7,7 @@ const {getRandomInt, shuffle} = require(`../../utils`);
 
 const DEFAULT_COUNT = 1;
 const FILE_NAME = `mocks.json`;
+const TXT_FILES_DIR = `./data/`;
 
 const TimeConstants = {
   MS: 1000,
@@ -14,6 +15,21 @@ const TimeConstants = {
   MINUTES: 60,
   HOURS: 24,
   DAYS_LIMIT: 90,
+};
+
+const makeMockData = async (files) => {
+  let mockData = {};
+  try {
+    for (const file of files) {
+      const fileName = file.split(`.`)[0];
+      const data = await readContent(fileName);
+      mockData[fileName] = data;
+    }
+    return mockData;
+  } catch (error) {
+    console.error(chalk.red(error));
+    return mockData;
+  }
 };
 
 const readContent = async (fileName) => {
@@ -33,26 +49,25 @@ const DateRestrict = {
   max: Date.now(),
 };
 
-const generateOffers = (count, titles, categories, sentences) => (
+const generateOffers = (count, mockData) => (
   Array(count).fill({}).map(() => ({
-    title: titles[getRandomInt(0, titles.length - 1)],
-    announce: shuffle(sentences).slice(0, getRandomInt(1, 5)).join(` `),
-    fullText: shuffle(sentences).slice(0, getRandomInt(1, sentences.length - 1)).join(` `),
+    title: mockData.titles[getRandomInt(0, mockData.titles.length - 1)],
+    announce: shuffle(mockData.sentences).slice(0, getRandomInt(1, 5)).join(` `),
+    fullText: shuffle(mockData.sentences).slice(0, getRandomInt(1, mockData.sentences.length - 1)).join(` `),
     createdDate: new Intl.DateTimeFormat(`ru-Ru`, {day: `numeric`, month: `numeric`, year: `numeric`, hour: `numeric`, minute: `numeric`, second: `numeric`}).format(new Date(getRandomInt(DateRestrict.min, DateRestrict.max))),
-    category: shuffle(categories).slice(0, getRandomInt(1, categories.length - 1)),
+    category: shuffle(mockData.categories).slice(0, getRandomInt(1, mockData.categories.length - 1)),
   }))
 );
 
 module.exports = {
   name: `--generate`,
   async run(args) {
-    const sentences = await readContent(`sentences`);
-    const titles = await readContent(`titles`);
-    const categories = await readContent(`categories`);
+    const files = await fs.readdir(TXT_FILES_DIR);
+    const mockData = await makeMockData(files);
 
     const [count] = args;
     const countOffer = Number.parseInt(count, 10) || DEFAULT_COUNT;
-    const content = JSON.stringify(generateOffers(countOffer, titles, categories, sentences), null, 2);
+    const content = JSON.stringify(generateOffers(countOffer, mockData), null, 2);
 
     try {
       await fs.writeFile(FILE_NAME, content);
