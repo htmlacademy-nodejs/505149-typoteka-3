@@ -20,9 +20,9 @@ block content
           button.popup__button.button.button--popup-close(type='button' aria-label='Закрыть окно') Закрыть окно
           h2.visually-hidden Форма регистрации
           ul.popup__tabs
-            li.popup__tab.popup__tab--active.popup__tab--register
+            li.popup__tab.popup__tab--register(class=isItLogin=== false ? 'popup__tab--active' : '')
               button.popup__tab-switcher.button(type='button') Регистрация
-            li.popup__tab.popup__tab--log-in
+            li.popup__tab.popup__tab--log-in(class=isItLogin=== true ? 'popup__tab--active' : '')
               button.popup__tab-switcher.button(type='button') Войти
           .popup__form.popup__form--active.form.form--register
             form(action='#' method='get')
