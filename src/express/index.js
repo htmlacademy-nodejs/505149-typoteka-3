@@ -22,3 +22,8 @@ app.get(`/`, (req, res) => res.render(`main`, {}));
 app.get(`/register`, (req, res) => res.render(`login`, {isItLogin: false}));
 app.get(`/login`, (req, res) => res.render(`login`, {isItLogin: true}));
 app.get(`/search`, (req, res) => res.render(`search`, {}));
+app.get(`/500`, (req, res) => res.render(`errors/500`));
+
+app.use((req, res) => {
+  res.status(404).render(`errors/404`);
+});
