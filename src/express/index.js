@@ -19,6 +19,6 @@ app.use(`/my`, myRoutes);
 app.use(`/offers`, offersRoutes);
 
 app.get(`/`, (req, res) => res.render(`main`, {}));
-app.get(`/register`, (req, res) => res.send(`/register`));
+app.get(`/register`, (req, res) => res.render(`login`, {}));
 app.get(`/login`, (req, res) => res.send(`/login`));
 app.get(`/search`, (req, res) => res.send(`/search`));
