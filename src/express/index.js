@@ -1,18 +1,33 @@
 'use strict';
 
 const express = require(`express`);
+const path = require(`path`);
 
 const myRoutes = require(`./routes/my`);
-const offersRoutes = require(`./routes/offers`);
+const articlesRoutes = require(`./routes/articles`);
 
 const app = express();
 const port = 8080;
 app.listen(port);
 
-app.use(`/my`, myRoutes);
-app.use(`/offers`, offersRoutes);
+app.use(express.static(path.join(__dirname, `files`)));
 
-app.get(`/`, (req, res) => res.send(`/`));
-app.get(`/register`, (req, res) => res.send(`/register`));
-app.get(`/login`, (req, res) => res.send(`/login`));
-app.get(`/search`, (req, res) => res.send(`/search`));
+app.set(`views`, path.join(__dirname, `templates`));
+app.set(`view engine`, `pug`);
+
+app.use(`/my`, myRoutes);
+app.use(`/articles`, articlesRoutes);
+
+app.get(`/`, (req, res) => res.render(`main`, {title: `Типотека`}));
+app.get(`/register`, (req, res) => res.render(`login`, {isItLogin: false, title: `Регистрация`}));
+app.get(`/login`, (req, res) => res.render(`login`, {isItLogin: true, title: `Войти`}));
+app.get(`/search`, (req, res) => res.render(`search`, {title: `Поиск`}));
+
+app.use((req, res) => {
+  res.status(404).render(`errors/404`, {title: `Страница не найдена`});
+});
+
+app.use((err, req, res, _next) => {
+  res.status(err.status || 500);
+  res.render(`errors/500`, {title: `Ошибка сервера`});
+});
