@@ -22,8 +22,12 @@ app.get(`/`, (req, res) => res.render(`main`, {title: `Типотека`}));
 app.get(`/register`, (req, res) => res.render(`login`, {isItLogin: false, title: `Регистрация`}));
 app.get(`/login`, (req, res) => res.render(`login`, {isItLogin: true, title: `Войти`}));
 app.get(`/search`, (req, res) => res.render(`search`, {title: `Поиск`}));
-app.get(`/500`, (req, res) => res.render(`errors/500`, {title: `Ошибка сервера`}));
 
 app.use((req, res) => {
   res.status(404).render(`errors/404`, {title: `Страница не найдена`});
+});
+
+app.use((err, req, res, _next) => {
+  res.status(err.status || 500);
+  res.render(`errors/500`, {title: `Ошибка сервера`});
 });
