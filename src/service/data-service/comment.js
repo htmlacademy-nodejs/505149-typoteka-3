@@ -1,5 +1,9 @@
 'use strict';
 
+const {nanoid} = require(`nanoid`);
+
+const {MAX_ID_LENGTH} = require(`../../constants`);
+
 class CommentService {
 
   findAll(offer) {
@@ -20,6 +24,14 @@ class CommentService {
     return commentToDelete;
   }
 
+  create(offer, comment) {
+    const newComment = Object.assign({
+      id: nanoid(MAX_ID_LENGTH),
+    }, comment);
+
+    offer.comments.push(newComment);
+    return comment;
+  }
 }
 
 module.exports = CommentService;
