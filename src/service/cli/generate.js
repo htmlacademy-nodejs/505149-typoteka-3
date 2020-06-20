@@ -3,7 +3,10 @@
 const chalk = require(`chalk`);
 const Intl = require(`intl`);
 const fs = require(`fs`).promises;
+const {nanoid} = require(`nanoid`);
+
 const {getRandomInt, shuffle} = require(`../../utils`);
+const {MAX_ID_LENGTH} = require(`../../../src/constants`);
 
 const DEFAULT_COUNT = 1;
 const FILE_NAME = `mocks.json`;
@@ -51,6 +54,7 @@ const DateRestrict = {
 
 const generateOffers = (count, mockData) => (
   Array(count).fill({}).map(() => ({
+    id: nanoid(MAX_ID_LENGTH),
     title: mockData.titles[getRandomInt(0, mockData.titles.length - 1)],
     announce: shuffle(mockData.sentences).slice(0, getRandomInt(1, 5)).join(` `),
     fullText: shuffle(mockData.sentences).slice(0, getRandomInt(1, mockData.sentences.length - 1)).join(` `),
