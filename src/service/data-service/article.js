@@ -30,6 +30,16 @@ class ArticleService {
     this._offers.push(newOffer);
     return newOffer;
   }
+
+  update(id, offer) {
+    const oldOffer = this._offers
+      .find((item) => item.id === id);
+
+    return Object.assign(oldOffer,
+        {
+          createdDate: new Intl.DateTimeFormat(`ru-Ru`, {day: `numeric`, month: `numeric`, year: `numeric`, hour: `numeric`, minute: `numeric`, second: `numeric`}).format(new Date())
+        }, offer);
+  }
 }
 
 module.exports = ArticleService;

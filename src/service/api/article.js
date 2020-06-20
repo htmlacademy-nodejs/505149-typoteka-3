@@ -36,4 +36,19 @@ module.exports = (app, service) => {
     return res.status(HttpCode.CREATED)
       .json(offer);
   });
+
+  route.put(`/:articleId`, articleValidator, (req, res) => {
+    const {articleId} = req.params;
+    const offer = service.findOne(articleId);
+
+    if (!offer) {
+      return res.status(HttpCode.NOT_FOUND)
+        .send(`Not found with ${articleId}`);
+    }
+
+    const updatedOffer = service.update(articleId, req.body);
+
+    return res.status(HttpCode.OK)
+      .json(updatedOffer);
+  });
 };
