@@ -1,0 +1,75 @@
+# Список категорий
+GET http://localhost:3000/api/categories HTTP/1.1
+
+###
+
+# Поиск done
+GET http://localhost:3000/api/search?query=камни HTTP/1.1
+
+###
+
+# Запрашивает все объявления done
+GET http://localhost:3000/api/articles HTTP/1.1
+
+###
+
+# Запрашивает объявление с идентификатором :id done
+
+GET http://localhost:3000/api/articles/1A_wZP HTTP/1.1
+
+###
+
+# Удаление объявления с идентификатором :id
+
+DELETE http://localhost:3000/api/articles/1A_wZP HTTP/1.1
+
+###
+
+# Добавление нового объявления done
+
+POST http://localhost:3000/api/articles HTTP/1.1
+Content-Type: application/json
+
+{
+  "category": ["Музыка"],
+  "fullText": "Это один из лучших рок-музыкантов. Ёлки — это не просто красивое дерево. Это прочная древесина. Помните, небольшое количество ежедневных упражнений лучше, чем один раз, но много. Этот смартфон — настоящая находка. Большой и яркий экран, мощнейший процессор — всё это в небольшом гаджете. Игры и программирование разные вещи. Не стоит идти в программисты, если вам нравится только игры.",
+  "announce": "Собрать камни бесконечности легко, если вы прирожденный герой.",
+  "title": "Новое объявление!"
+}
+
+###
+
+# Обновление объявления done
+
+PUT http://localhost:3000/api/articles/1A_wZP HTTP/1.1
+Content-Type: application/json
+
+{
+  "category": ["Разное"],
+  "fullText": "Не стоит идти в программисты, если вам нравится только игры.",
+  "announce": "Изменение объявления!",
+  "title": "Куку"
+}
+
+###
+
+# Список комментариев done
+
+GET http://localhost:3000/api/articles/K3Qpl5/comments HTTP/1.1
+
+###
+
+# Удаляет комментарий done
+
+DELETE http://localhost:3000/api/articles/K3Qpl5/comments/QtaJrJ HTTP/1.1
+
+###
+
+# Добавляет новый комментарий к публикации done
+
+POST http://localhost:3000/api/articles/K3Qpl5/comments HTTP/1.1
+Content-Type: application/json
+
+{
+  "text": "Это новый комментарий"
+}
