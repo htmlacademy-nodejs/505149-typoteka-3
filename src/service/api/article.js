@@ -4,14 +4,15 @@ const {Router} = require(`express`);
 
 const {HttpCode} = require(`../../constants`);
 const articleValidator = require(`../middlewares/article-validator`);
+const articleExist = require(`../middlewares/article-exist`);
 
 const route = new Router();
 
-module.exports = (app, service) => {
+module.exports = (app, articleService, commentService) => {
   app.use(`/articles`, route);
 
   route.get(`/`, (req, res) => {
-    const offers = service.findAll();
+    const offers = articleService.findAll();
 
     return res.status(HttpCode.OK)
         .json(offers);
@@ -19,7 +20,7 @@ module.exports = (app, service) => {
 
   route.get(`/:articleId`, (req, res) => {
     const {articleId} = req.params;
-    const offer = service.findOne(articleId);
+    const offer = articleService.findOne(articleId);
 
     if (!offer) {
       return res.status(HttpCode.NOT_FOUND)
@@ -31,7 +32,7 @@ module.exports = (app, service) => {
   });
 
   route.post(`/`, articleValidator, (req, res) => {
-    const offer = service.create(req.body);
+    const offer = articleService.create(req.body);
 
     return res.status(HttpCode.CREATED)
       .json(offer);
@@ -39,14 +40,14 @@ module.exports = (app, service) => {
 
   route.put(`/:articleId`, articleValidator, (req, res) => {
     const {articleId} = req.params;
-    const offer = service.findOne(articleId);
+    const offer = articleService.findOne(articleId);
 
     if (!offer) {
       return res.status(HttpCode.NOT_FOUND)
         .send(`Not found with ${articleId}`);
     }
 
-    const updatedOffer = service.update(articleId, req.body);
+    const updatedOffer = articleService.update(articleId, req.body);
 
     return res.status(HttpCode.OK)
       .json(updatedOffer);
@@ -54,7 +55,7 @@ module.exports = (app, service) => {
 
   route.delete(`/:articleId`, (req, res) => {
     const {articleId} = req.params;
-    const offer = service.delete(articleId);
+    const offer = articleService.delete(articleId);
 
     if (!offer) {
       return res.status(HttpCode.NOT_FOUND)
@@ -63,5 +64,14 @@ module.exports = (app, service) => {
 
     return res.status(HttpCode.OK)
       .json(offer);
+  });
+
+  route.get(`/:articleId/comments`, articleExist(articleService), (req, res) => {
+    const {offer} = res.locals;
+
+    const comments = commentService.findAll(offer);
+
+    return res.status(HttpCode.OK)
+      .json(comments);
   });
 };
