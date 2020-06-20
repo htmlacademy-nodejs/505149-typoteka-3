@@ -51,4 +51,17 @@ module.exports = (app, service) => {
     return res.status(HttpCode.OK)
       .json(updatedOffer);
   });
+
+  route.delete(`/:articleId`, (req, res) => {
+    const {articleId} = req.params;
+    const offer = service.delete(articleId);
+
+    if (!offer) {
+      return res.status(HttpCode.NOT_FOUND)
+        .send(`Not found`);
+    }
+
+    return res.status(HttpCode.OK)
+      .json(offer);
+  });
 };

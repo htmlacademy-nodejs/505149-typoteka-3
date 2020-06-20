@@ -40,6 +40,17 @@ class ArticleService {
           createdDate: new Intl.DateTimeFormat(`ru-Ru`, {day: `numeric`, month: `numeric`, year: `numeric`, hour: `numeric`, minute: `numeric`, second: `numeric`}).format(new Date())
         }, offer);
   }
+
+  delete(id) {
+    const offer = this._offers.find((item) => item.id === id);
+
+    if (!offer) {
+      return null;
+    }
+
+    this._offers = this._offers.filter((item) => item.id !== id);
+    return offer;
+  }
 }
 
 module.exports = ArticleService;
