@@ -15,4 +15,17 @@ module.exports = (app, service) => {
     return res.status(HttpCode.OK)
         .json(offers);
   });
+
+  route.get(`/:articleId`, (req, res) => {
+    const {articleId} = req.params;
+    const offer = service.findOne(articleId);
+
+    if (!offer) {
+      return res.status(HttpCode.NOT_FOUND)
+        .send(`Not found with ${articleId}`);
+    }
+
+    return res.status(HttpCode.OK)
+        .json(offer);
+  });
 };
