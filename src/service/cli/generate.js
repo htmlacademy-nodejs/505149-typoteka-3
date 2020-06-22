@@ -3,9 +3,13 @@
 const chalk = require(`chalk`);
 const Intl = require(`intl`);
 const fs = require(`fs`).promises;
+const {nanoid} = require(`nanoid`);
+
 const {getRandomInt, shuffle} = require(`../../utils`);
+const {MAX_ID_LENGTH} = require(`../../../src/constants`);
 
 const DEFAULT_COUNT = 1;
+const MAX_COMMENTS = 4;
 const FILE_NAME = `mocks.json`;
 const TXT_FILES_DIR = `./data/`;
 
@@ -49,13 +53,24 @@ const DateRestrict = {
   max: Date.now(),
 };
 
+const generateComments = (count, comments) => (
+  Array(count).fill({}).map(() => ({
+    id: nanoid(MAX_ID_LENGTH),
+    text: shuffle(comments)
+      .slice(0, getRandomInt(1, 3))
+      .join(` `),
+  }))
+);
+
 const generateOffers = (count, mockData) => (
   Array(count).fill({}).map(() => ({
+    id: nanoid(MAX_ID_LENGTH),
     title: mockData.titles[getRandomInt(0, mockData.titles.length - 1)],
     announce: shuffle(mockData.sentences).slice(0, getRandomInt(1, 5)).join(` `),
     fullText: shuffle(mockData.sentences).slice(0, getRandomInt(1, mockData.sentences.length - 1)).join(` `),
     createdDate: new Intl.DateTimeFormat(`ru-Ru`, {day: `numeric`, month: `numeric`, year: `numeric`, hour: `numeric`, minute: `numeric`, second: `numeric`}).format(new Date(getRandomInt(DateRestrict.min, DateRestrict.max))),
     category: shuffle(mockData.categories).slice(0, getRandomInt(1, mockData.categories.length - 1)),
+    comments: generateComments(getRandomInt(1, MAX_COMMENTS), mockData.comments),
   }))
 );
 
