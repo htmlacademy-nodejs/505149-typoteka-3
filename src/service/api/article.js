@@ -6,8 +6,10 @@ const {HttpCode} = require(`../../constants`);
 const articleValidator = require(`../middlewares/article-validator`);
 const articleExist = require(`../middlewares/article-exist`);
 const commentValidator = require(`../middlewares/comment-validator`);
+const {getLogger} = require(`../lib/logger`);
 
 const route = new Router();
+const logger = getLogger();
 
 module.exports = (app, articleService, commentService) => {
   app.use(`/articles`, route);
@@ -24,8 +26,9 @@ module.exports = (app, articleService, commentService) => {
     const offer = articleService.findOne(articleId);
 
     if (!offer) {
+      logger.error(`Did not found article with ${articleId}`);
       return res.status(HttpCode.NOT_FOUND)
-        .send(`Not found with ${articleId}`);
+        .send(`Did not found article with ${articleId}`);
     }
 
     return res.status(HttpCode.OK)
@@ -44,8 +47,9 @@ module.exports = (app, articleService, commentService) => {
     const offer = articleService.findOne(articleId);
 
     if (!offer) {
+      logger.error(`Did not found article with ${articleId}`);
       return res.status(HttpCode.NOT_FOUND)
-        .send(`Not found with ${articleId}`);
+        .send(`Did not found article with ${articleId}`);
     }
 
     const updatedOffer = articleService.update(articleId, req.body);
@@ -59,8 +63,9 @@ module.exports = (app, articleService, commentService) => {
     const offer = articleService.delete(articleId);
 
     if (!offer) {
+      logger.error(`Did not found article with ${articleId}`);
       return res.status(HttpCode.NOT_FOUND)
-        .send(`Not found`);
+        .send(`Did not found article with ${articleId}`);
     }
 
     return res.status(HttpCode.OK)
@@ -82,8 +87,9 @@ module.exports = (app, articleService, commentService) => {
     const deletedComment = commentService.delete(offer, commentId);
 
     if (!deletedComment) {
+      logger.error(`Did not found comment with ${commentId}`);
       return res.status(HttpCode.NOT_FOUND)
-        .send(`Not found`);
+        .send(`Did not found comment with ${commentId}`);
     }
 
     return res.status(HttpCode.OK)
