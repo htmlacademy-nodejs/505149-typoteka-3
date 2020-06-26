@@ -23,8 +23,10 @@
   "devDependencies": {
     "eslint": "6.8.0",
     "eslint-config-htmlacademy": "0.5.2",
+    "jest": "26.1.0",
     "nodemon": "2.0.2",
-    "pug-lint": "2.6.0"
+    "pug-lint": "2.6.0",
+    "supertest": "4.0.2"
   },
   "dependencies": {
     "chalk": "3.0.0",
