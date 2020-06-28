@@ -14,14 +14,16 @@ const {
   SearchService,
 } = require(`../data-service`);
 
-const app = new Router();
+const createApi = async () => {
+  const agregatingRouter = new Router();
 
-(async () => {
   const mockData = await getMockData();
 
-  article(app, new ArticleService(mockData), new CommentService());
-  category(app, new CategoryService(mockData));
-  search(app, new SearchService(mockData));
-})();
+  category(agregatingRouter, new CategoryService(mockData));
+  article(agregatingRouter, new ArticleService(mockData), new CommentService());
+  search(agregatingRouter, new SearchService(mockData));
 
-module.exports = app;
+  return agregatingRouter;
+};
+
+module.exports = createApi;

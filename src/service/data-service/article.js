@@ -3,7 +3,11 @@
 const {nanoid} = require(`nanoid`);
 const Intl = require(`intl`);
 
+const {getLogger} = require(`../lib/logger`);
+
 const {MAX_ID_LENGTH} = require(`../../../src/constants`);
+
+const logger = getLogger();
 
 class ArticleService {
   constructor(offers) {
@@ -45,6 +49,7 @@ class ArticleService {
     const offer = this._offers.find((item) => item.id === id);
 
     if (!offer) {
+      logger.error(`Did not found article`);
       return null;
     }
 
