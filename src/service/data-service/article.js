@@ -49,7 +49,7 @@ class ArticleService {
     const offer = this._offers.find((item) => item.id === id);
 
     if (!offer) {
-      logger.error(`Did not found article`);
+      logger.error(`Did not find article`);
       return null;
     }
 
