@@ -7,6 +7,7 @@ const {DateTimeFormat} = require(`intl`);
 const getArticles = require(`./api/articles`);
 const myRoutes = require(`./routes/my`);
 const articlesRoutes = require(`./routes/articles`);
+const {getSortedByDateComments} = require(`../lib/sort-comments`);
 
 const app = express();
 const port = 8080;
@@ -22,9 +23,11 @@ app.use(`/articles`, articlesRoutes);
 
 app.get(`/`, async (req, res) => {
   const articles = await getArticles();
+  const articlesId = articles.map((it) => it.id);
   const sortedByQtyOfComments = articles.slice().sort((a, b) => b.comments.length - a.comments.length);
+  const sortedByDateComments = (await getSortedByDateComments(articlesId)).slice(0, 4);
 
-  res.render(`main`, {articles, sortedByQtyOfComments, title: `Типотека`, DateTimeFormat});
+  res.render(`main`, {articles, sortedByQtyOfComments, title: `Типотека`, DateTimeFormat, sortedByDateComments});
 });
 app.get(`/register`, (req, res) => res.render(`login`, {isItLogin: false, title: `Регистрация`}));
 app.get(`/login`, (req, res) => res.render(`login`, {isItLogin: true, title: `Войти`}));

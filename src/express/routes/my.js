@@ -5,7 +5,7 @@ const {DateTimeFormat} = require(`intl`);
 
 const getArticles = require(`../api/articles`);
 const getArticle = require(`../api/article`);
-const getComments = require(`../api/comments`);
+const {getSortedByDateComments} = require(`../../lib/sort-comments`);
 
 const myRouter = new Router();
 
@@ -25,10 +25,7 @@ myRouter.get(`/comments`, async (req, res) => {
   }
 
   const articlesId = myArticles.map((it) => it.id);
-
-  const sortedByDateComments = await Promise.all(articlesId.map((id) => getComments(id)))
-      .then((results) => results.flat().sort((a, b) => (new Date(b.date)) - (new Date(a.date))));
-
+  const sortedByDateComments = await getSortedByDateComments(articlesId);
   for (const comment of sortedByDateComments) {
     comment.articleTitle = (await getArticle(comment.articleId)).title;
   }
