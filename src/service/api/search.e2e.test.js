@@ -6,7 +6,7 @@ const {createApp} = require(`../cli/server`);
 const {HttpCode} = require(`../../constants`);
 
 describe(`Search API end-points:`, () => {
-  const query = `камни`;
+  const query = `как`;
   let app = null;
   let res;
 
