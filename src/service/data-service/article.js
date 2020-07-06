@@ -1,7 +1,6 @@
 'use strict';
 
 const {nanoid} = require(`nanoid`);
-const Intl = require(`intl`);
 
 const {getLogger} = require(`../lib/logger`);
 
@@ -28,7 +27,7 @@ class ArticleService {
           {
             id: nanoid(MAX_ID_LENGTH),
             comments: [],
-            createdDate: new Intl.DateTimeFormat(`ru-Ru`, {day: `numeric`, month: `numeric`, year: `numeric`, hour: `numeric`, minute: `numeric`, second: `numeric`}).format(new Date())
+            createdDate: new Date().toISOString(),
           }, offer);
 
     this._offers.push(newOffer);
@@ -41,7 +40,7 @@ class ArticleService {
 
     return Object.assign(oldOffer,
         {
-          createdDate: new Intl.DateTimeFormat(`ru-Ru`, {day: `numeric`, month: `numeric`, year: `numeric`, hour: `numeric`, minute: `numeric`, second: `numeric`}).format(new Date())
+          createdDate: new Date().toISOString()
         }, offer);
   }
 
