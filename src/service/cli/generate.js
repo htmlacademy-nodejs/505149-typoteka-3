@@ -3,7 +3,7 @@
 const fs = require(`fs`).promises;
 const {nanoid} = require(`nanoid`);
 
-const {getLogger} = require(`../lib/logger`);
+const {getLogger} = require(`../../lib/logger`);
 const {getRandomInt, shuffle} = require(`../../utils`);
 
 const {MAX_ID_LENGTH} = require(`../../../src/constants`);

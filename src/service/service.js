@@ -1,7 +1,7 @@
 'use strict';
 
 const {Cli} = require(`./cli`);
-const {getLogger} = require(`./lib/logger`);
+const {getLogger} = require(`../lib/logger`);
 const {
   DEFAULT_COMMAND,
   MAX_DATA_COUNT,

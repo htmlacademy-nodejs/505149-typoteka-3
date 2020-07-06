@@ -1,6 +1,6 @@
 'use strict';
 
-const {getLogger} = require(`../lib/logger`);
+const {getLogger} = require(`../../lib/logger`);
 const packageJsonFile = require(`../../../package.json`);
 
 const logger = getLogger();

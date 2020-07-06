@@ -3,7 +3,7 @@
 const {Router} = require(`express`);
 
 const {HttpCode} = require(`../../constants`);
-const {getLogger} = require(`../lib/logger`);
+const {getLogger} = require(`../../lib/logger`);
 
 const route = new Router();
 const logger = getLogger();

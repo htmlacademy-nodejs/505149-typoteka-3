@@ -6,7 +6,7 @@ const {HttpCode} = require(`../../constants`);
 const articleValidator = require(`../middlewares/article-validator`);
 const articleExist = require(`../middlewares/article-exist`);
 const commentValidator = require(`../middlewares/comment-validator`);
-const {getLogger} = require(`../lib/logger`);
+const {getLogger} = require(`../../lib/logger`);
 
 const route = new Router();
 const logger = getLogger();

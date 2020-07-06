@@ -1,7 +1,7 @@
 'use strict';
 
 const {HttpCode} = require(`../../constants`);
-const {getLogger} = require(`../lib/logger`);
+const {getLogger} = require(`../../lib/logger`);
 
 const logger = getLogger();
 

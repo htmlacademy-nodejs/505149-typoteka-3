@@ -4,7 +4,7 @@ const express = require(`express`);
 
 const {HttpCode} = require(`../../constants`);
 const createApi = require(`../api`);
-const {getLogger} = require(`../lib/logger`);
+const {getLogger} = require(`../../lib/logger`);
 
 const DEFAULT_PORT = 3000;
 

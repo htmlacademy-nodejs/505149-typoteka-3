@@ -2,7 +2,7 @@
 
 const {nanoid} = require(`nanoid`);
 
-const {getLogger} = require(`../lib/logger`);
+const {getLogger} = require(`../../lib/logger`);
 
 const {MAX_ID_LENGTH} = require(`../../../src/constants`);
 
