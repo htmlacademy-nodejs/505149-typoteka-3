@@ -22,8 +22,9 @@ app.use(`/articles`, articlesRoutes);
 
 app.get(`/`, async (req, res) => {
   const articles = await getArticles();
+  const sortedByQtyOfComments = articles.slice().sort((a, b) => b.comments.length - a.comments.length);
 
-  res.render(`main`, {articles, title: `Типотека`, DateTimeFormat});
+  res.render(`main`, {articles, sortedByQtyOfComments, title: `Типотека`, DateTimeFormat});
 });
 app.get(`/register`, (req, res) => res.render(`login`, {isItLogin: false, title: `Регистрация`}));
 app.get(`/login`, (req, res) => res.render(`login`, {isItLogin: true, title: `Войти`}));
