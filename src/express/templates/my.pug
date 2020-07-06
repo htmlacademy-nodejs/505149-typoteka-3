@@ -15,7 +15,7 @@ block content
       section.main-page__notes.notes
         h1.notes__title Мои записи
         ul.notes__list
-          each article in articles
+          each article in myArticles
             li.notes__list-item
               time.notes__item-time(datetime=article.createdDate)= `${new DateTimeFormat(`ru-Ru`, {day: `numeric`, month: `numeric`, year: `numeric`, hour: `numeric`, minute: `numeric`, second: `numeric`}).format(new Date(article.createdDate))}`
               a.notes__item-text(href='#')= article.announce
