@@ -26,20 +26,14 @@ myRouter.get(`/comments`, async (req, res) => {
 
   const articlesId = myArticles.map((it) => it.id);
 
-  const sortedByCommentDate = await Promise.all(articlesId.map((id) => getComments(id)))
-      .then((results) => {
-        return results.flat().sort((a, b) => (new Date(b.date)) - (new Date(a.date)));
-      });
+  const sortedByDateComments = await Promise.all(articlesId.map((id) => getComments(id)))
+      .then((results) => results.flat().sort((a, b) => (new Date(b.date)) - (new Date(a.date))));
 
-  const commentsWithArticleTitle = await Promise.all(sortedByCommentDate.map(async (it) => {
-    const article = await getArticle(it.articleId);
-    it.articleTitle = article.title;
-    return it;
-  })).then((results) => {
-    return results;
-  });
+  for (const comment of sortedByDateComments) {
+    comment.articleTitle = (await getArticle(comment.articleId)).title;
+  }
 
-  res.render(`comments`, {commentsWithArticleTitle, title: `Комментарии`, DateTimeFormat});
+  res.render(`comments`, {sortedByDateComments, title: `Комментарии`, DateTimeFormat});
 });
 
 module.exports = myRouter;
