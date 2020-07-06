@@ -3,7 +3,7 @@
 const {Router} = require(`express`);
 const {DateTimeFormat} = require(`intl`);
 
-const getArticles = require(`../../api/articles`);
+const getArticles = require(`../api/articles`);
 
 const myRouter = new Router();
 

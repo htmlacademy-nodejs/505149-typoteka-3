@@ -2,7 +2,7 @@
 
 const axios = require(`axios`);
 
-const {getLogger} = require(`../service/lib/logger`);
+const {getLogger} = require(`../../service/lib/logger`);
 
 const logger = getLogger();
 

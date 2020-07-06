@@ -70,7 +70,7 @@ const generateOffers = (count, mockData) => (
     announce: shuffle(mockData.sentences).slice(0, getRandomInt(1, 3)).join(` `),
     fullText: shuffle(mockData.sentences).slice(0, getRandomInt(1, mockData.sentences.length - 1)).join(` `),
     createdDate: new Date(getRandomInt(DateRestrict.min, DateRestrict.max)).toISOString(),
-    category: shuffle(mockData.categories).slice(0, getRandomInt(1, mockData.categories.length - 1)),
+    category: shuffle(mockData.categories).slice(0, getRandomInt(1, mockData.categories.length - 3)),
     comments: generateComments(getRandomInt(1, MAX_COMMENTS), mockData.comments),
   }))
 );
