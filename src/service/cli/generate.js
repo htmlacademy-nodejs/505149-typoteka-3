@@ -57,14 +57,15 @@ const DateRestrict = {
 const generateComments = (count, comments) => (
   Array(count).fill({}).map(() => ({
     id: nanoid(MAX_ID_LENGTH),
+    date: new Date(getRandomInt(DateRestrict.min, DateRestrict.max)).toISOString(),
     text: shuffle(comments)
       .slice(0, getRandomInt(1, 3))
       .join(` `),
   }))
 );
 
-const generateOffers = (count, mockData) => (
-  Array(count).fill({}).map(() => ({
+const generateOffers = (count, mockData) => {
+  const array = Array(count).fill({}).map(() => ({
     id: nanoid(MAX_ID_LENGTH),
     title: mockData.titles[getRandomInt(0, mockData.titles.length - 1)],
     announce: shuffle(mockData.sentences).slice(0, getRandomInt(1, 3)).join(` `),
@@ -72,8 +73,16 @@ const generateOffers = (count, mockData) => (
     createdDate: new Date(getRandomInt(DateRestrict.min, DateRestrict.max)).toISOString(),
     category: shuffle(mockData.categories).slice(0, getRandomInt(1, mockData.categories.length - 3)),
     comments: generateComments(getRandomInt(1, MAX_COMMENTS), mockData.comments),
-  }))
-);
+  }));
+
+  for (const article of array) {
+    article.comments.forEach((comment) => {
+      comment.articleId = article.id;
+    });
+  }
+
+  return array;
+};
 
 module.exports = {
   name: `--generate`,
