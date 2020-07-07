@@ -15,31 +15,31 @@ block content
       section.modal.modal--flex
         .popup.popup--new-publication.popup--flex
           .new-publication
-            .new-publication__header
-              h1= (article ? `Редактировать публикацию` : `Новая публикация`)
-              .new-publication__date-form
-                h3 Дата публикации
-                form(action='#' method='POST')
-                  .new-publication__date-block
-                    label(for='new-publication-date' aria-label='Календарь')
-                    input#new-publication-date(type='text' name='createdDate' value=(article && article.createdDate ? `${new DateTimeFormat(`ru-Ru`, {day: `numeric`, month: `numeric`, year: `numeric`, hour: `numeric`, minute: `numeric`, second: `numeric`}).format(new Date(article.createdDate))}` : '') placeholder= (article && article.createdDate ? `${new DateTimeFormat(`ru-Ru`, {day: `numeric`, month: `numeric`, year: `numeric`, hour: `numeric`, minute: `numeric`, second: `numeric`}).format(new Date(article.createdDate))}` : `21.03.2019`))
-              button.new-publication__button.button.button--colored(type='submit') Опубликовать
-            button.popup__button.button.button--popup-close(type='button' aria-label='Закрыть окно') Закрыть окно
-            .new-publication__form.form
-              form(action='#' method='get')
+            form(action='#' method='POST')
+              .new-publication__header
+                h1= (article ? `Редактировать публикацию` : `Новая публикация`)
+                .new-publication__date-form
+                  h3 Дата публикации
+                  .new-publication__date-form-division
+                    .new-publication__date-block
+                      label(for='new-publication-date' aria-label='Календарь')
+                      input#new-publication-date(type='text' name='createdDate' value=(article && article.createdDate ? `${new DateTimeFormat(`ru-Ru`, {day: `numeric`, month: `numeric`, year: `numeric`, hour: `numeric`, minute: `numeric`, second: `numeric`}).format(new Date(article.createdDate))}` : '') placeholder= (article && article.createdDate ? `${new DateTimeFormat(`ru-Ru`, {day: `numeric`, month: `numeric`, year: `numeric`, hour: `numeric`, minute: `numeric`, second: `numeric`}).format(new Date(article.createdDate))}` : `21.03.2019`))
+                button.new-publication__button.button.button--colored(type='submit') Опубликовать
+              button.popup__button.button.button--popup-close(type='button' aria-label='Закрыть окно') Закрыть окно
+              .new-publication__form.form
                 .form__wrapper.form__wrapper--intro
                   .form__field
                     label
                       input(type='text' name='title' placeholder='Заголовок', value=(article && article.title ? article.title : '') required)
                   .form__field.form__field--post-image
                     label
-                      input#image-name-field(type='text' placeholder='Фотография' readonly)
+                      input#image-name-field(type='text' value='moya_mashinka.jpg' placeholder='Фотография' readonly)
                     .form__image-loader.form__image-loader--publication
                       label
                         input.visually-hidden(type='file')
                         | Обзор
                     button.button.button--transparent Удалить
-                  .new-publication__checkbox.new-publication__checkbox--auto
+                  .new-publication__checkbox
                     each category, index in categories
                       input(
                         id='category-checkbox-' + index type='checkbox',
