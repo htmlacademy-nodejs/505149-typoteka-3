@@ -5,9 +5,9 @@ const path = require(`path`);
 const {DateTimeFormat} = require(`intl`);
 
 const getArticles = require(`./api/articles`);
-const getSearchResults = require(`./api/search`);
 const myRoutes = require(`./routes/my`);
 const articlesRoutes = require(`./routes/articles`);
+const searchRoutes = require(`./routes/search`);
 const {getSortedByDateComments} = require(`../lib/utils`);
 const {getLogger} = require(`../lib/logger`);
 
@@ -23,6 +23,7 @@ app.set(`view engine`, `pug`);
 
 app.use(`/my`, myRoutes);
 app.use(`/articles`, articlesRoutes);
+app.use(`/search`, searchRoutes);
 
 app.get(`/`, async (req, res) => {
   const articles = await getArticles();
@@ -34,15 +35,7 @@ app.get(`/`, async (req, res) => {
 });
 app.get(`/register`, (req, res) => res.render(`login`, {isItLogin: false, title: `Регистрация`}));
 app.get(`/login`, (req, res) => res.render(`login`, {isItLogin: true, title: `Войти`}));
-app.get(`/search`, async (req, res) => res.render(`search`, {title: `Поиск`}));
-app.get(`/search-results`, async (req, res) => {
-  const query = req.query.search;
-  const encodedURI = encodeURI(query);
 
-  const articles = await getSearchResults(encodedURI);
-
-  res.render(`search-results`, {articles, title: `Найдено`, query, DateTimeFormat});
-});
 
 app.use((req, res) => {
   res.status(404).render(`errors/404`, {title: `Страница не найдена`});
