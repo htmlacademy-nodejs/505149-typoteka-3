@@ -3,6 +3,7 @@
 const {nanoid} = require(`nanoid`);
 
 const {getLogger} = require(`../../lib/logger`);
+const {dateToTime} = require(`../../lib/utils`);
 
 const {MAX_ID_LENGTH} = require(`../../../src/constants`);
 
@@ -29,6 +30,8 @@ class ArticleService {
             comments: [],
             createdDate: new Date().toISOString(),
           }, offer);
+
+    newOffer.createdDate = new Date(dateToTime(`d.m.y`, offer.createdDate)).toISOString();
 
     this._offers.push(newOffer);
     return newOffer;

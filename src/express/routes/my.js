@@ -5,7 +5,7 @@ const {DateTimeFormat} = require(`intl`);
 
 const getArticles = require(`../api/articles`);
 const getArticle = require(`../api/article`);
-const {getSortedByDateComments} = require(`../../lib/sort-comments`);
+const {getSortedByDateComments} = require(`../../lib/utils`);
 
 const myRouter = new Router();
 
