@@ -26,5 +26,5 @@ block content
                 a.search__link(href=`../../articles/${article.id}`)
                   - var sentences = article.title.split(query)
                   |  #{sentences[0]}
-                  b  #{query}
+                  b  #{sentences.length === 1 ? `` : query}
                   |  #{sentences[1]}
