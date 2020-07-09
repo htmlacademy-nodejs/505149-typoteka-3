@@ -53,7 +53,12 @@ articlesRouter.post(`/add`, async (req, res) => {
       .on(`error`, async (err) => {
         logger.error(`There is error while parsing form data. ${err}`);
 
-        article.createdDate = new Date(dateToTime(`d.m.y`, article.createdDate)).toISOString();
+        if (article.createdDate) {
+          article.createdDate = new Date(dateToTime(`d.m.y`, article.createdDate)).toISOString();
+        } else {
+          article.createdDate = Date.now();
+        }
+
         article.picture = ``;
         if (categories.length === 0) {
           categories = await getCategories();
