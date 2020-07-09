@@ -80,7 +80,12 @@ articlesRouter.post(`/add`, async (req, res) => {
 });
 articlesRouter.get(`/category/:id`, (req, res) => res.render(`articles-by-category`, {title: `Статьи по категории`}));
 articlesRouter.get(`/categories`, (req, res) => res.render(`all-categories`, {title: `Категории`}));
-articlesRouter.get(`/:id`, (req, res) => res.render(`post`, {title: `Пост`}));
+articlesRouter.get(`/:id`, async (req, res) => {
+  const {id} = req.params;
+  const article = await getArticle(id);
+
+  res.render(`post`, {DateTimeFormat, article, title: `Пост`});
+});
 articlesRouter.get(`/edit/:id`, async (req, res) => {
   const {id} = req.params;
   const article = await getArticle(id);
