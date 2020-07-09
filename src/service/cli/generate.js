@@ -73,6 +73,7 @@ const generateOffers = (count, mockData) => {
     createdDate: new Date(getRandomInt(DateRestrict.min, DateRestrict.max)).toISOString(),
     category: shuffle(mockData.categories).slice(0, getRandomInt(1, mockData.categories.length - 3)),
     comments: generateComments(getRandomInt(1, MAX_COMMENTS), mockData.comments),
+    picture: ``,
   }));
 
   for (const article of array) {
