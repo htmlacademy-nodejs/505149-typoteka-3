@@ -15,17 +15,17 @@ describe(`Search API end-points:`, () => {
   });
 
   test(`status code of get search query should be 200`, async () => {
-    res = await request(app).get(encodeURI(`/api/search?query=${query}`));
+    res = await request(app).get(encodeURI(`/api/search?search=${query}`));
     expect(res.statusCode).toBe(HttpCode.OK);
   });
 
   test(`output have to be array`, async () => {
-    res = await request(app).get(encodeURI(`/api/search?query=${query}`));
+    res = await request(app).get(encodeURI(`/api/search?search=${query}`));
     expect(Array.isArray(res.body)).toBeTruthy();
   });
 
   test(`each item of output should have title property`, async () => {
-    res = await request(app).get(encodeURI(`/api/search?query=${query}`));
+    res = await request(app).get(encodeURI(`/api/search?search=${query}`));
     const response = res.body;
     for (const item of response) {
       expect(item).toHaveProperty(`title`);
@@ -39,7 +39,7 @@ describe(`Search API end-points:`, () => {
   });
 
   test(`Should return 404 status for wrong request`, async () => {
-    res = await request(app).get(encodeURI(`/api/search?query=${null}`));
+    res = await request(app).get(encodeURI(`/api/search?search=${null}`));
 
     expect(res.statusCode).toBe(HttpCode.NOT_FOUND);
   });
