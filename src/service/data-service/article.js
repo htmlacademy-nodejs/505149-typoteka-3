@@ -1,9 +1,9 @@
 'use strict';
 
 const {nanoid} = require(`nanoid`);
-const Intl = require(`intl`);
 
-const {getLogger} = require(`../lib/logger`);
+const {getLogger} = require(`../../lib/logger`);
+const {dateToTime} = require(`../../lib/utils`);
 
 const {MAX_ID_LENGTH} = require(`../../../src/constants`);
 
@@ -28,8 +28,10 @@ class ArticleService {
           {
             id: nanoid(MAX_ID_LENGTH),
             comments: [],
-            createdDate: new Intl.DateTimeFormat(`ru-Ru`, {day: `numeric`, month: `numeric`, year: `numeric`, hour: `numeric`, minute: `numeric`, second: `numeric`}).format(new Date())
+            createdDate: new Date().toISOString(),
           }, offer);
+
+    newOffer.createdDate = new Date(dateToTime(`d.m.y`, offer.createdDate)).toISOString();
 
     this._offers.push(newOffer);
     return newOffer;
@@ -41,7 +43,7 @@ class ArticleService {
 
     return Object.assign(oldOffer,
         {
-          createdDate: new Intl.DateTimeFormat(`ru-Ru`, {day: `numeric`, month: `numeric`, year: `numeric`, hour: `numeric`, minute: `numeric`, second: `numeric`}).format(new Date())
+          createdDate: new Date().toISOString()
         }, offer);
   }
 
@@ -49,7 +51,7 @@ class ArticleService {
     const offer = this._offers.find((item) => item.id === id);
 
     if (!offer) {
-      logger.error(`Did not found article`);
+      logger.error(`Did not find article`);
       return null;
     }
 

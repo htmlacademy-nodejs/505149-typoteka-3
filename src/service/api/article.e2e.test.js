@@ -104,14 +104,26 @@ describe(`Article API end-points:`, () => {
   });
 
   test(`DELETE article request should work and status code after deleting should be 200`, async () => {
-    res = await request(app).get(`/api/articles`);
-    const firstLength = res.body.length;
-
     res = await request(app).delete(`/api/articles/${articleMock.id}`);
     expect(res.statusCode).toBe(HttpCode.OK);
+    expect(res.body).toEqual({
+      "id": `1`,
+      "title": `New title`,
+      "announce": `Some text`,
+      "fullText": `Some very long text`,
+      "createdDate": `25.03.2020, 23:14:51`,
+      "category": [
+        `Программирование`,
+      ],
+      "comments": [
+        {
+          "id": `1`,
+          "text": `Some comment`
+        }
+      ],
+    });
 
     res = await request(app).get(`/api/articles`);
-    expect(res.body.length).toBe(firstLength - 1);
   });
 
   test(`status for incorrect DELETE article request should be 404`, async () => {

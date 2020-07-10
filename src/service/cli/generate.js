@@ -1,10 +1,9 @@
 'use strict';
 
-const Intl = require(`intl`);
 const fs = require(`fs`).promises;
 const {nanoid} = require(`nanoid`);
 
-const {getLogger} = require(`../lib/logger`);
+const {getLogger} = require(`../../lib/logger`);
 const {getRandomInt, shuffle} = require(`../../utils`);
 
 const {MAX_ID_LENGTH} = require(`../../../src/constants`);
@@ -58,23 +57,33 @@ const DateRestrict = {
 const generateComments = (count, comments) => (
   Array(count).fill({}).map(() => ({
     id: nanoid(MAX_ID_LENGTH),
+    date: new Date(getRandomInt(DateRestrict.min, DateRestrict.max)).toISOString(),
     text: shuffle(comments)
       .slice(0, getRandomInt(1, 3))
       .join(` `),
   }))
 );
 
-const generateOffers = (count, mockData) => (
-  Array(count).fill({}).map(() => ({
+const generateOffers = (count, mockData) => {
+  const array = Array(count).fill({}).map(() => ({
     id: nanoid(MAX_ID_LENGTH),
     title: mockData.titles[getRandomInt(0, mockData.titles.length - 1)],
-    announce: shuffle(mockData.sentences).slice(0, getRandomInt(1, 5)).join(` `),
+    announce: shuffle(mockData.sentences).slice(0, getRandomInt(1, 3)).join(` `),
     fullText: shuffle(mockData.sentences).slice(0, getRandomInt(1, mockData.sentences.length - 1)).join(` `),
-    createdDate: new Intl.DateTimeFormat(`ru-Ru`, {day: `numeric`, month: `numeric`, year: `numeric`, hour: `numeric`, minute: `numeric`, second: `numeric`}).format(new Date(getRandomInt(DateRestrict.min, DateRestrict.max))),
-    category: shuffle(mockData.categories).slice(0, getRandomInt(1, mockData.categories.length - 1)),
+    createdDate: new Date(getRandomInt(DateRestrict.min, DateRestrict.max)).toISOString(),
+    category: shuffle(mockData.categories).slice(0, getRandomInt(1, mockData.categories.length - 3)),
     comments: generateComments(getRandomInt(1, MAX_COMMENTS), mockData.comments),
-  }))
-);
+    picture: ``,
+  }));
+
+  for (const article of array) {
+    article.comments.forEach((comment) => {
+      comment.articleId = article.id;
+    });
+  }
+
+  return array;
+};
 
 module.exports = {
   name: `--generate`,

@@ -27,6 +27,8 @@ class CommentService {
   create(offer, comment) {
     const newComment = Object.assign({
       id: nanoid(MAX_ID_LENGTH),
+      date: new Date().toISOString(),
+      articleId: offer.id,
     }, comment);
 
     offer.comments.push(newComment);

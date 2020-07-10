@@ -6,7 +6,7 @@ const {HttpCode} = require(`../../constants`);
 const articleValidator = require(`../middlewares/article-validator`);
 const articleExist = require(`../middlewares/article-exist`);
 const commentValidator = require(`../middlewares/comment-validator`);
-const {getLogger} = require(`../lib/logger`);
+const {getLogger} = require(`../../lib/logger`);
 
 const route = new Router();
 const logger = getLogger();
@@ -26,9 +26,9 @@ module.exports = (app, articleService, commentService) => {
     const offer = articleService.findOne(articleId);
 
     if (!offer) {
-      logger.error(`Did not found article with ${articleId}`);
+      logger.error(`Did not find article with ${articleId}`);
       return res.status(HttpCode.NOT_FOUND)
-        .send(`Did not found article with ${articleId}`);
+        .send(`Did not find article with ${articleId}`);
     }
 
     return res.status(HttpCode.OK)
@@ -47,9 +47,9 @@ module.exports = (app, articleService, commentService) => {
     const offer = articleService.findOne(articleId);
 
     if (!offer) {
-      logger.error(`Did not found article with ${articleId}`);
+      logger.error(`Did not find article with ${articleId}`);
       return res.status(HttpCode.NOT_FOUND)
-        .send(`Did not found article with ${articleId}`);
+        .send(`Did not find article with ${articleId}`);
     }
 
     const updatedOffer = articleService.update(articleId, req.body);
@@ -63,9 +63,9 @@ module.exports = (app, articleService, commentService) => {
     const offer = articleService.delete(articleId);
 
     if (!offer) {
-      logger.error(`Did not found article with ${articleId}`);
+      logger.error(`Did not find article with ${articleId}`);
       return res.status(HttpCode.NOT_FOUND)
-        .send(`Did not found article with ${articleId}`);
+        .send(`Did not find article with ${articleId}`);
     }
 
     return res.status(HttpCode.OK)
@@ -87,9 +87,9 @@ module.exports = (app, articleService, commentService) => {
     const deletedComment = commentService.delete(offer, commentId);
 
     if (!deletedComment) {
-      logger.error(`Did not found comment with ${commentId}`);
+      logger.error(`Did not find comment with ${commentId}`);
       return res.status(HttpCode.NOT_FOUND)
-        .send(`Did not found comment with ${commentId}`);
+        .send(`Did not find comment with ${commentId}`);
     }
 
     return res.status(HttpCode.OK)
