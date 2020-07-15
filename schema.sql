@@ -1,12 +1,6 @@
-DROP ROLE IF EXISTS typoteka;
-
+/* There are initial commands under postgres user*/
 DROP DATABASE IF EXISTS typoteka_blog;
-
-DROP TABLE IF EXISTS users;
-DROP TABLE IF EXISTS articles;
-DROP TABLE IF EXISTS categories;
-DROP TABLE IF EXISTS comments;
-DROP TABLE IF EXISTS articles_categories;
+DROP ROLE IF EXISTS typoteka;
 
 CREATE ROLE typoteka WITH
     LOGIN
@@ -26,6 +20,13 @@ CREATE DATABASE typoteka_blog
     LC_COLLATE = 'C'
     LC_CTYPE = 'C'
     CONNECTION LIMIT = -1;
+
+/* There are commands under typoteka user*/
+DROP TABLE IF EXISTS comments;
+DROP TABLE IF EXISTS articles_categories;
+DROP TABLE IF EXISTS articles;
+DROP TABLE IF EXISTS categories;
+DROP TABLE IF EXISTS users;
 
 CREATE TABLE users
 (
@@ -63,6 +64,7 @@ CREATE TABLE categories
 (
     id bigserial NOT NULL,
     title character varying(50) NOT NULL,
+    picture character varying(500),
     PRIMARY KEY (id)
 );
 
