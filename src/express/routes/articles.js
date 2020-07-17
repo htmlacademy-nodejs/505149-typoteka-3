@@ -67,6 +67,9 @@ articlesRouter.post(`/add`, async (req, res) => {
         res.render(`new-post`, {article, DateTimeFormat, title: `Публикация`, categories});
       })
       .on(`end`, async () => {
+        if (!article.createdDate) {
+          article.createdDate = new DateTimeFormat(`ru-Ru`, {day: `numeric`, month: `numeric`, year: `numeric`, hour: `numeric`, minute: `numeric`, second: `numeric`}).format(Date.now());
+        }
         if (isAllowedFormat) {
           await postArticle(article);
           res.redirect(`/my`);
