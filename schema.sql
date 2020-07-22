@@ -40,13 +40,14 @@ CREATE TABLE users
 );
 
 CREATE UNIQUE INDEX email_index ON users ((lower(email)));
+SET datestyle = "ISO, DMY";
 
 CREATE TABLE articles
 (
     id bigserial NOT NULL,
     title character varying(100) NOT NULL,
-    announce character varying(200) NOT NULL,
-    fullText character varying(1000) NOT NULL,
+    announce character varying(500) NOT NULL,
+    fullText character varying(5000) NOT NULL,
     picture character varying(500),
     created_date DATE NOT NULL,
     user_id bigint NOT NULL,

@@ -4,55 +4,14 @@ const fs = require(`fs`).promises;
 const {nanoid} = require(`nanoid`);
 
 const {getLogger} = require(`../../lib/logger`);
-const {getRandomInt, shuffle} = require(`../../utils`);
+const {getRandomInt, shuffle, DateRestrict, makeMockData, TXT_FILES_DIR} = require(`../../utils`);
 
 const {MAX_ID_LENGTH} = require(`../../../src/constants`);
 const DEFAULT_COUNT = 1;
 const MAX_COMMENTS = 4;
 const FILE_NAME = `mocks.json`;
-const TXT_FILES_DIR = `./data/`;
 
 const logger = getLogger();
-
-const TimeConstants = {
-  MS: 1000,
-  SECONDS: 60,
-  MINUTES: 60,
-  HOURS: 24,
-  DAYS_LIMIT: 90,
-};
-
-const makeMockData = async (files) => {
-  let mockData = {};
-  try {
-    for (const file of files) {
-      const fileName = file.split(`.`)[0];
-      const data = await readContent(fileName);
-      mockData[fileName] = data;
-    }
-    return mockData;
-  } catch (error) {
-    logger.error(error);
-    return mockData;
-  }
-};
-
-const readContent = async (fileName) => {
-  try {
-    const content = await fs.readFile(`./data/${fileName}.txt`, `utf8`);
-    const contentArray = content.split(`\n`);
-    contentArray.pop();
-    return contentArray;
-  } catch (err) {
-    logger.error(err);
-    return [];
-  }
-};
-
-const DateRestrict = {
-  min: Date.now() - TimeConstants.SECONDS * TimeConstants.MINUTES * TimeConstants.HOURS * TimeConstants.DAYS_LIMIT * TimeConstants.MS,
-  max: Date.now(),
-};
 
 const generateComments = (count, comments) => (
   Array(count).fill({}).map(() => ({
