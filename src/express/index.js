@@ -2,13 +2,11 @@
 
 const express = require(`express`);
 const path = require(`path`);
-const {DateTimeFormat} = require(`intl`);
 
-const getArticles = require(`./api/articles`);
-const myRoutes = require(`./routes/my`);
-const articlesRoutes = require(`./routes/articles`);
-const searchRoutes = require(`./routes/search`);
-const {getSortedByDateComments} = require(`../lib/utils`);
+const myRoutes = require(`./routes/my-routes`);
+const articlesRoutes = require(`./routes/articles-routes`);
+const searchRoutes = require(`./routes/search-routes`);
+const mainRoutes = require(`./routes/main-routes`);
 const {getLogger} = require(`../lib/logger`);
 
 const logger = getLogger();
@@ -21,21 +19,10 @@ app.use(express.static(path.join(__dirname, `files`)));
 app.set(`views`, path.join(__dirname, `templates`));
 app.set(`view engine`, `pug`);
 
+app.use(`/`, mainRoutes);
 app.use(`/my`, myRoutes);
 app.use(`/articles`, articlesRoutes);
 app.use(`/search`, searchRoutes);
-
-app.get(`/`, async (req, res) => {
-  const articles = await getArticles();
-  const articlesId = articles.map((it) => it.id);
-  const sortedByQtyOfComments = articles.slice().sort((a, b) => b.comments.length - a.comments.length);
-  const sortedByDateComments = (await getSortedByDateComments(articlesId)).slice(0, 4);
-
-  res.render(`main`, {articles, sortedByQtyOfComments, title: `Типотека`, DateTimeFormat, sortedByDateComments});
-});
-app.get(`/register`, (req, res) => res.render(`login`, {isItLogin: false, title: `Регистрация`}));
-app.get(`/login`, (req, res) => res.render(`login`, {isItLogin: true, title: `Войти`}));
-
 
 app.use((req, res) => {
   res.status(404).render(`errors/404`, {title: `Страница не найдена`});
