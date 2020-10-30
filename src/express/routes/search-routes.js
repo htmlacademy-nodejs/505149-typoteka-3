@@ -12,10 +12,15 @@ searchRouter.get(`/`, async (req, res) => res.render(`search`, {title: `Поис
 searchRouter.get(`/results`, async (req, res) => {
   const query = req.query.search;
   const encodedURI = encodeURI(query);
+  const message = query ? `Ничего не найдено` : `Пустой запрос`;
 
   const articles = await getSearchResults(encodedURI);
 
-  res.render(`search-results`, {articles, title: `Найдено`, query, DateTimeFormat});
+  if (articles) {
+    res.render(`search-results`, {articles, title: `Найдено`, query, DateTimeFormat});
+  } else {
+    res.render(`search-empty`, {title: `Ничего не найдено`, query, message});
+  }
 });
 
 module.exports = searchRouter;

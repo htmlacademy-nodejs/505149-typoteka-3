@@ -13,15 +13,11 @@ block content
       a.header__search.button.button--search(href='/search' aria-label='поиск по сайту')
     main
       section.search-page
-        .search-page__wrapper
+        .search-page__wrapper.search-page__wrapper--empty
           h1 Поиск
           .search.search-page__form
             form(action='/search/results/' method='get')
               label
                 input(type='search' name='search' placeholder='Что ищем?' value= query)
               button.search__button.button.button--transparent(type='submit') Найти
-            each article in articles
-              .search__result
-                time.search__date(datetime=article.createdTime)= `${new DateTimeFormat(`ru-Ru`, {day: `numeric`, month: `numeric`, year: `numeric`, hour: `numeric`, minute: `numeric`, second: `numeric`}).format(new Date(article.createdDate))}`
-                a.search__link(href=`../../articles/${article.id}`)
-                  |  #{article.title}
+          p.search-page__empty= message

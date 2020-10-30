@@ -4,9 +4,9 @@ const fs = require(`fs`).promises;
 const {nanoid} = require(`nanoid`);
 
 const {getLogger} = require(`../../lib/logger`);
-const {getRandomInt, shuffle, DateRestrict, makeMockData, TXT_FILES_DIR} = require(`../../utils`);
+const {getRandomInt, shuffle, DateRestrict, makeMockData} = require(`../../utils`);
 
-const {MAX_ID_LENGTH} = require(`../../../src/constants`);
+const {MAX_ID_LENGTH, TXT_FILES_DIR} = require(`../../../src/constants`);
 const DEFAULT_COUNT = 1;
 const MAX_COMMENTS = 4;
 const FILE_NAME = `mocks.json`;

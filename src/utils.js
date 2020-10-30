@@ -27,7 +27,6 @@ const readContent = async (fileName) => {
 };
 
 module.exports = {
-  TXT_FILES_DIR: `./data/`,
   TimeConstants,
   DateRestrict: {
     min: Date.now() - TimeConstants.SECONDS * TimeConstants.MINUTES * TimeConstants.HOURS * TimeConstants.DAYS_LIMIT * TimeConstants.MS,

@@ -16,14 +16,17 @@ module.exports = (app, service) => {
 
     if (!search) {
       logger.error(`Empty query...`);
-      res.status(HttpCode.BAD_REQUEST).json([]);
+      res.status(HttpCode.BAD_REQUEST).json(null);
       return;
     }
 
     const searchResults = service.findAll(search.toLowerCase());
-    const searchStatus = searchResults.length > 0 ? HttpCode.OK : HttpCode.NOT_FOUND;
 
-    res.status(searchStatus)
-      .json(searchResults);
+    if (searchResults.length) {
+      res.status(HttpCode.OK).json(searchResults);
+    } else {
+      logger.info(`Did not find offers`);
+      res.status(HttpCode.NOT_FOUND).send(null);
+    }
   });
 };
