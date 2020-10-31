@@ -6,32 +6,32 @@ const {MAX_ID_LENGTH} = require(`../../constants`);
 
 class CommentService {
 
-  findAll(offer) {
-    return offer.comments;
+  findAll(article) {
+    return article.comments;
   }
 
-  delete(offer, commentId) {
-    const commentToDelete = offer.comments
+  delete(article, commentId) {
+    const commentToDelete = article.comments
       .find((item) => item.id === commentId);
 
     if (!commentToDelete) {
       return null;
     }
 
-    offer.comments = offer.comments
+    article.comments = article.comments
       .filter((item) => item.id !== commentId);
 
     return commentToDelete;
   }
 
-  create(offer, comment) {
+  create(article, comment) {
     const newComment = Object.assign({
       id: nanoid(MAX_ID_LENGTH),
       date: new Date().toISOString(),
-      articleId: offer.id,
+      articleId: article.id,
     }, comment);
 
-    offer.comments.push(newComment);
+    article.comments.push(newComment);
     return comment;
   }
 }

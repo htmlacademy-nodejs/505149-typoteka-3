@@ -44,9 +44,9 @@ const createArticlesAndCategoriesRelations = (amount, categoriesQty) => {
   let id = 1;
   let set;
   for (let i = 0; i < categoriesQty; i++) {
-    const offersByCategoryQty = getRandomInt(1, amount);
+    const articlesByCategoryQty = getRandomInt(1, amount);
     set = new Set();
-    for (let k = 0; k < offersByCategoryQty; k++) {
+    for (let k = 0; k < articlesByCategoryQty; k++) {
       set.add(`(${getRandomInt(1, amount)}, ${id}),\n`);
     }
     result = result + [...set].join(``);

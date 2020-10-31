@@ -25,7 +25,7 @@ module.exports = (app, service) => {
     if (searchResults.length) {
       res.status(HttpCode.OK).json(searchResults);
     } else {
-      logger.info(`Did not find offers`);
+      logger.info(`Did not find articles`);
       res.status(HttpCode.NOT_FOUND).send(null);
     }
   });
