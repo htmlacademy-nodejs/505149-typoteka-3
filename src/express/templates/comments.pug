@@ -21,7 +21,7 @@ block content
                 img.publication__list-image(src='/img/avatar-small-2.png' width='20' height='20' alt='Аватар пользователя')
                 b.publication__list-name Александр Петров
                 time.publication__item-time(datetime=comment.date)= `${new DateTimeFormat(`ru-Ru`, {day: `numeric`, month: `numeric`, year: `numeric`, hour: `numeric`, minute: `numeric`, second: `numeric`}).format(new Date(comment.date))}`
-              a.publication__item-text(href='#')= comment.text
+              a.publication__item-text(href=`/articles/${comment.articleId}#postcomments`)= comment.text
               p.publication__text-strong= comment.articleTitle
               button.publication__button.button.button--close-item(type='button')
                 span.visually-hidden Закрыть строку списка
