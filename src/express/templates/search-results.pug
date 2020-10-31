@@ -23,5 +23,5 @@ block content
             each article in articles
               .search__result
                 time.search__date(datetime=article.createdTime)= `${new DateTimeFormat(`ru-Ru`, {day: `numeric`, month: `numeric`, year: `numeric`, hour: `numeric`, minute: `numeric`, second: `numeric`}).format(new Date(article.createdDate))}`
-                a.search__link(href=`../../articles/${article.id}`)
+                a.search__link(href=`/articles/${article.id}`)
                   |  #{article.title}
