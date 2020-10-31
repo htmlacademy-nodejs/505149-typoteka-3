@@ -1,4 +1,4 @@
-extends layouts/layout.pug
+extends layout.pug
 
 block content
   .wrapper
@@ -9,7 +9,7 @@ block content
       button.button.button--colored.header__button-new Новая запись
       .header__dropdown
         a.button.button--burger.header__burger(href='#') Открыть меню
-        include ./layouts/burger.pug
+        include ./partials/burger.pug
       a.header__search.button.button--search(href='/search' aria-label='поиск по сайту')
     main
       section.modal.modal--flex
@@ -23,7 +23,7 @@ block content
                   .new-publication__date-form-division
                     .new-publication__date-block
                       label(for='new-publication-date' aria-label='Календарь')
-                      input#new-publication-date(type='text' name='createdDate' value=(article && article.createdDate ? `${new DateTimeFormat(`ru-Ru`, {day: `numeric`, month: `numeric`, year: `numeric`}).format(new Date(article.createdDate))}` : '') placeholder= (article && article.createdDate ? `${new DateTimeFormat(`ru-Ru`, {day: `numeric`, month: `numeric`, year: `numeric`}).format(new Date(article.createdDate))}` : `21.03.2019`))
+                      input#new-publication-date(type='text' name='createdDate' value=(article && article.createdDate ? `${new DateTimeFormat(`ru-Ru`, {day: `numeric`, month: `numeric`, year: `numeric`}).format(new Date(article.createdDate))}` : '') placeholder= (article && article.createdDate ? `${new DateTimeFormat(`ru-Ru`, {day: `numeric`, month: `numeric`, year: `numeric`}).format(new Date(article.createdDate))}` : `${new DateTimeFormat(`ru-Ru`, {day: `numeric`, month: `numeric`, year: `numeric`}).format(new Date())}`))
                 button.new-publication__button.button.button--colored(type='submit') Опубликовать
               button.popup__button.button.button--popup-close(type='button' aria-label='Закрыть окно') Закрыть окно
               .new-publication__form.form

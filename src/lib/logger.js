@@ -1,29 +1,24 @@
 'use strict';
 
-const fs = require(`fs`);
-const pinoms = require(`pino-multi-stream`);
+const pino = require(`pino`);
+const dateFormat = require(`dateformat`);
 
-const prettyStream = pinoms.prettyStream({
+const {Env} = require(`../constants`);
+
+const isDevMode = process.env.NODE_ENV === Env.DEVELOPMENT;
+const isFront = process.env.IS_FRONT;
+const LOG_FILE = isFront ? `src/logs/front.log` : `src/logs/api.log`;
+const defaultLogLevel = isDevMode ? `debug` : `error`;
+
+const logger = pino({
+  name: `base-logger`,
+  level: process.env.LOG_LEVEL || defaultLogLevel,
   prettyPrint: {
-    colorize: true,
-    translateTime: `dd-mm-yyyy HH:MM:ss`,
-    ignore: `hostname,pid`,
-    levelFirst: true,
+    colorize: process.env.COLOR || false,
+    translateTime: dateFormat(new Date(), `dd.m h:MM T`),
+    ignore: `pid,hostname`,
   },
-  prettifier: require(`pino-pretty`)
-});
-
-const level = process.env.LOG_LEVEL || `info`;
-const streams = [
-  {level, stream: prettyStream},
-  {level, stream: fs.createWriteStream(`./src/service/logs/all.txt`)},
-  {level: `error`, stream: fs.createWriteStream(`./src/service/logs/errors.txt`)},
-];
-
-const logger = pinoms({
-  name: `pino-in-express`,
-  level,
-}, pinoms.multistream(streams));
+}, isDevMode ? process.stdout : pino.destination(LOG_FILE));
 
 module.exports = {
   logger,

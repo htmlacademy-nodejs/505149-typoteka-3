@@ -1,4 +1,4 @@
-extends layouts/layout.pug
+extends layout.pug
 
 block content
   .wrapper.wrapper--nobackground
@@ -9,7 +9,7 @@ block content
       button.button.button--colored.header__button-new Новая запись
       .header__dropdown
         a.button.button--burger.header__burger(href='#') Открыть меню
-        include ./layouts/burger.pug
+        include ./partials/burger.pug
       a.header__search.button.button--search(href='/search' aria-label='поиск по сайту')
     main.main-page.main-page--padding
       section.main-page__notes.notes
@@ -17,7 +17,8 @@ block content
         ul.notes__list
           each article in myArticles
             li.notes__list-item
-              time.notes__item-time(datetime=article.createdDate)= `${new DateTimeFormat(`ru-Ru`, {day: `numeric`, month: `numeric`, year: `numeric`, hour: `numeric`, minute: `numeric`, second: `numeric`}).format(new Date(article.createdDate))}`
-              a.notes__item-text(href='#')= article.title
+              time.notes__item-time(datetime=article.createdDate)
+                +time(new Date(article.createdDate))
+              a.notes__item-text(href=`/articles/${article.id}`)= article.title
               button.notes__button.button.button--close-item(type='button')
                 span.visually-hidden Закрыть строку списка

@@ -1,4 +1,4 @@
-extends layouts/layout.pug
+extends layout.pug
 
 block content
   .wrapper.wrapper--nobackground
@@ -9,7 +9,7 @@ block content
       button.button.button--colored.header__button-new Новая запись
       .header__dropdown
         a.button.button--burger.header__burger(href='#') Открыть меню
-        include ./layouts/burger.pug
+        include ./partials/burger.pug
       a.header__search.button.button--search(href='/search' aria-label='поиск по сайту')
     main.main-page.main-page--padding
       section.main-page__publication.publication
@@ -20,8 +20,9 @@ block content
               .publication__header
                 img.publication__list-image(src='/img/avatar-small-2.png' width='20' height='20' alt='Аватар пользователя')
                 b.publication__list-name Александр Петров
-                time.publication__item-time(datetime=comment.date)= `${new DateTimeFormat(`ru-Ru`, {day: `numeric`, month: `numeric`, year: `numeric`, hour: `numeric`, minute: `numeric`, second: `numeric`}).format(new Date(comment.date))}`
-              a.publication__item-text(href='#')= comment.text
+                time.publication__item-time(datetime=comment.date)
+                  +time(new Date(comment.date))
+              a.publication__item-text(href=`/articles/${comment.articleId}#postcomments`)= comment.text
               p.publication__text-strong= comment.articleTitle
               button.publication__button.button.button--close-item(type='button')
                 span.visually-hidden Закрыть строку списка

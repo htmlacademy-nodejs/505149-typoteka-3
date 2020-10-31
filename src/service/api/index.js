@@ -19,7 +19,7 @@ const createApi = async () => {
 
   const mockData = await getMockData();
 
-  category(agregatingRouter, new CategoryService(mockData));
+  category(agregatingRouter, new CategoryService(mockData), new ArticleService(mockData));
   article(agregatingRouter, new ArticleService(mockData), new CommentService());
   search(agregatingRouter, new SearchService(mockData));
 

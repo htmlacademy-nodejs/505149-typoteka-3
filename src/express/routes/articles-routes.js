@@ -3,25 +3,29 @@
 const {Router} = require(`express`);
 const {DateTimeFormat} = require(`intl`);
 const formidable = require(`formidable`);
+const path = require(`path`);
 
-const getArticle = require(`../api/article`);
-const getCategories = require(`../api/categories`);
-const postArticle = require(`../api/new-article`);
 const {getLogger} = require(`../../lib/logger`);
 const {dateToTime} = require(`../../lib/utils`);
+const api = require(`../api`).getAPI();
+
+const UPLOAD_DIR = `../upload/img/`;
 
 const articlesRouter = new Router();
 
-const logger = getLogger();
+const uploadDirAbsolute = path.resolve(__dirname, UPLOAD_DIR);
 
-let categories = [];
+const logger = getLogger({
+  name: `front-server-formidable`,
+});
 
 articlesRouter.get(`/add`, async (req, res) => {
-  categories = await getCategories();
+  const categories = await api.getCategories();
   res.render(`new-post`, {DateTimeFormat, title: `Публикация`, categories});
 });
 
 articlesRouter.post(`/add`, async (req, res) => {
+  const categories = await api.getCategories();
   const allowedTypes = [`image/jpeg`, `image/png`];
   let isAllowedFormat;
   let article = {category: []};
@@ -41,7 +45,7 @@ articlesRouter.post(`/add`, async (req, res) => {
           isAllowedFormat = false;
         } else {
           isAllowedFormat = true;
-          file.path = process.cwd() + `/src/express/files/img/` + file.name;
+          file.path = uploadDirAbsolute + `/` + file.name;
         }
       })
       .on(`file`, (name, file) => {
@@ -61,7 +65,7 @@ articlesRouter.post(`/add`, async (req, res) => {
 
         article.picture = ``;
         if (categories.length === 0) {
-          categories = await getCategories();
+          categories = await api.getCategories();
         }
 
         res.render(`new-post`, {article, DateTimeFormat, title: `Публикация`, categories});
@@ -71,7 +75,7 @@ articlesRouter.post(`/add`, async (req, res) => {
           article.createdDate = new DateTimeFormat(`ru-Ru`, {day: `numeric`, month: `numeric`, year: `numeric`, hour: `numeric`, minute: `numeric`, second: `numeric`}).format(Date.now());
         }
         if (isAllowedFormat) {
-          await postArticle(article);
+          await api.createArticle(article);
           res.redirect(`/my`);
         } else {
           formData.emit(`error`, `Not correct file's extension.`);
@@ -81,19 +85,36 @@ articlesRouter.post(`/add`, async (req, res) => {
     logger.error(`Error happened: ${error}`);
   }
 });
-articlesRouter.get(`/category/:id`, (req, res) => res.render(`articles-by-category`, {title: `Статьи по категории`}));
-articlesRouter.get(`/categories`, (req, res) => res.render(`all-categories`, {title: `Категории`}));
+
+articlesRouter.get(`/categories`, async (req, res) => {
+  const categories = await api.getCategories();
+
+  res.render(`all-categories`, {title: `Категории`, categories});
+});
+
+articlesRouter.get(`/category/:id`, async (req, res) => {
+  const {id} = req.params;
+  const categories = await api.getCategories();
+  const selectedCategory = categories[id - 1];
+  const articlesByCategory = await api.getArticlesByCategory(id);
+
+  res.render(`articles-by-category`, {title: `Статьи по категории`, categories, selectedCategory, articlesByCategory, id, DateTimeFormat});
+});
+
 articlesRouter.get(`/:id`, async (req, res) => {
   const {id} = req.params;
-  const article = await getArticle(id);
+  const article = await api.getArticle(id);
+  const categories = await api.getCategories();
 
-  res.render(`post`, {DateTimeFormat, article, title: `Пост`});
+  res.render(`post`, {DateTimeFormat, article, title: `Пост`, categories});
 });
+
 articlesRouter.get(`/edit/:id`, async (req, res) => {
   const {id} = req.params;
-  const article = await getArticle(id);
+  const categories = await api.getCategories();
+  const article = await api.getArticle(id);
   if (categories.length === 0) {
-    categories = await getCategories();
+    categories = await api.getCategories();
   }
 
   if (article) {

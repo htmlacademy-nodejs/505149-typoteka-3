@@ -4,9 +4,12 @@ const fs = require(`fs`).promises;
 const {DateTimeFormat} = require(`intl`);
 
 const {getLogger} = require(`../../lib/logger`);
-const {getRandomInt, shuffle, makeMockData, DateRestrict, TXT_FILES_DIR} = require(`../../utils`);
+const {getRandomInt, shuffle, makeMockData, DateRestrict} = require(`../../utils`);
+const {TXT_FILES_DIR} = require(`../../constants`);
 
-const logger = getLogger();
+const logger = getLogger({
+  name: `api-server-sql`,
+});
 
 const FILE_NAME = `fill-db.sql`;
 const DEFAULT_COUNT = 3;
@@ -24,7 +27,7 @@ const createCategories = (categories) => {
 const createArticles = (data, amount) => {
   let result = ``;
   for (let index = 1; index <= amount; index++) {
-    result = result + `(${index}, '${data.titles[getRandomInt(0, data.titles.length - 1)]}', '${shuffle(data.sentences).slice(0, getRandomInt(1, 3)).join(` `)}', '${shuffle(data.sentences).slice(0, getRandomInt(1, data.sentences.length - 1)).join(` `)}', '', '${`${new DateTimeFormat(`ru-RU`, {year: `numeric`, day: `numeric`, month: `numeric`}).format(new Date(getRandomInt(DateRestrict.min, DateRestrict.max)))}`}', ${getRandomInt(1, 2)}),\n`;
+    result = result + `(${index}, '${data.titles[getRandomInt(0, data.titles.length - 1)]}', '${shuffle(data.sentences).slice(0, getRandomInt(1, 3)).join(` `)}', '${shuffle(data.sentences).slice(0, getRandomInt(1, data.sentences.length - 1)).join(` `)}', 'sea-fullsize@1x.jpg', '${`${new DateTimeFormat(`ru-RU`, {year: `numeric`, day: `numeric`, month: `numeric`}).format(new Date(getRandomInt(DateRestrict.min, DateRestrict.max)))}`}', ${getRandomInt(1, 2)}),\n`;
   }
   return `${result.trim().slice(0, -1)};`;
 };
@@ -44,9 +47,9 @@ const createArticlesAndCategoriesRelations = (amount, categoriesQty) => {
   let id = 1;
   let set;
   for (let i = 0; i < categoriesQty; i++) {
-    const offersByCategoryQty = getRandomInt(1, amount);
+    const articlesByCategoryQty = getRandomInt(1, amount);
     set = new Set();
-    for (let k = 0; k < offersByCategoryQty; k++) {
+    for (let k = 0; k < articlesByCategoryQty; k++) {
       set.add(`(${getRandomInt(1, amount)}, ${id}),\n`);
     }
     result = result + [...set].join(``);

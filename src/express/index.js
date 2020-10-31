@@ -2,47 +2,40 @@
 
 const express = require(`express`);
 const path = require(`path`);
-const {DateTimeFormat} = require(`intl`);
 
-const getArticles = require(`./api/articles`);
-const myRoutes = require(`./routes/my`);
-const articlesRoutes = require(`./routes/articles`);
-const searchRoutes = require(`./routes/search`);
-const {getSortedByDateComments} = require(`../lib/utils`);
+const myRoutes = require(`./routes/my-routes`);
+const articlesRoutes = require(`./routes/articles-routes`);
+const searchRoutes = require(`./routes/search-routes`);
+const mainRoutes = require(`./routes/main-routes`);
 const {getLogger} = require(`../lib/logger`);
 
-const logger = getLogger();
+const PUBLIC_DIR = `files`;
+const UPLOAD_DIR = `upload`;
+
+const logger = getLogger({
+  name: `front-server`,
+});
 
 const app = express();
 const port = 8080;
 app.use(express.urlencoded({extended: false}));
-app.use(express.static(path.join(__dirname, `files`)));
+app.use(express.static(path.join(__dirname, PUBLIC_DIR)));
+app.use(express.static(path.join(__dirname, UPLOAD_DIR)));
 
 app.set(`views`, path.join(__dirname, `templates`));
 app.set(`view engine`, `pug`);
 
+app.use(`/`, mainRoutes);
 app.use(`/my`, myRoutes);
 app.use(`/articles`, articlesRoutes);
 app.use(`/search`, searchRoutes);
-
-app.get(`/`, async (req, res) => {
-  const articles = await getArticles();
-  const articlesId = articles.map((it) => it.id);
-  const sortedByQtyOfComments = articles.slice().sort((a, b) => b.comments.length - a.comments.length);
-  const sortedByDateComments = (await getSortedByDateComments(articlesId)).slice(0, 4);
-
-  res.render(`main`, {articles, sortedByQtyOfComments, title: `Типотека`, DateTimeFormat, sortedByDateComments});
-});
-app.get(`/register`, (req, res) => res.render(`login`, {isItLogin: false, title: `Регистрация`}));
-app.get(`/login`, (req, res) => res.render(`login`, {isItLogin: true, title: `Войти`}));
-
 
 app.use((req, res) => {
   res.status(404).render(`errors/404`, {title: `Страница не найдена`});
 });
 
 app.use((err, req, res, _next) => {
-  res.status(err.status || 500);
+  logger.error(`Error status - ${err.status || 500}, ${err}`);
   res.render(`errors/500`, {title: `Ошибка сервера`});
 });
 

@@ -7,56 +7,62 @@ const {dateToTime} = require(`../../lib/utils`);
 
 const {MAX_ID_LENGTH} = require(`../../../src/constants`);
 
-const logger = getLogger();
+const logger = getLogger({
+  name: `api-server`,
+});
 
 class ArticleService {
-  constructor(offers) {
-    this._offers = offers;
+  constructor(articles) {
+    this._articles = articles;
   }
 
   findAll() {
-    return this._offers;
+    return this._articles;
   }
 
   findOne(id) {
-    return this._offers.find((item) => item.id === id);
+    return this._articles.find((item) => item.id === id);
   }
 
-  create(offer) {
-    const newOffer = Object
+  findByCategory(category) {
+    return this._articles.filter((article) => article.category.includes(category));
+  }
+
+  create(article) {
+    const newArticle = Object
       .assign(
           {
             id: nanoid(MAX_ID_LENGTH),
             comments: [],
             createdDate: new Date().toISOString(),
-          }, offer);
+          }, article);
 
-    newOffer.createdDate = new Date(dateToTime(`d.m.y`, offer.createdDate)).toISOString();
+    newArticle.createdDate = new Date(dateToTime(`d.m.y`, article.createdDate)).toISOString();
 
-    this._offers.push(newOffer);
-    return newOffer;
+    this._articles.push(newArticle);
+    return newArticle;
   }
 
-  update(id, offer) {
-    const oldOffer = this._offers
+  update(id, article) {
+    const oldArticle = this._articles
       .find((item) => item.id === id);
 
-    return Object.assign(oldOffer,
+    return Object.assign(oldArticle,
         {
           createdDate: new Date().toISOString()
-        }, offer);
+        }, article);
   }
 
   delete(id) {
-    const offer = this._offers.find((item) => item.id === id);
+    const article = this._articles.find((item) => item.id === id);
 
-    if (!offer) {
+    if (!article) {
       logger.error(`Did not find article`);
       return null;
     }
 
-    this._offers = this._offers.filter((item) => item.id !== id);
-    return offer;
+    this._articles = this._articles.filter((item) => item.id !== id);
+    return article;
   }
 }
 

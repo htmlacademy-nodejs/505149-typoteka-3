@@ -3,18 +3,20 @@
 const {HttpCode} = require(`../../constants`);
 const {getLogger} = require(`../../lib/logger`);
 
-const logger = getLogger();
+const logger = getLogger({
+  name: `api-server`,
+});
 
 module.exports = (service) => (req, res, next) => {
   const {articleId} = req.params;
-  const offer = service.findOne(articleId);
+  const article = service.findOne(articleId);
 
-  if (!offer) {
+  if (!article) {
     logger.error(`Did not find article with ${articleId}`);
     return res.status(HttpCode.NOT_FOUND)
-      .send(`Offer with ${articleId} not found`);
+      .send(`Article with ${articleId} not found`);
   }
 
-  res.locals.offer = offer;
+  res.locals.article = article;
   return next();
 };
