@@ -6,6 +6,7 @@ const formidable = require(`formidable`);
 
 const getArticle = require(`../api/article`);
 const getCategories = require(`../api/categories`);
+const getArticlesByCategory = require(`../api/category`);
 const postArticle = require(`../api/new-article`);
 const {getLogger} = require(`../../lib/logger`);
 const {dateToTime} = require(`../../lib/utils`);
@@ -81,14 +82,29 @@ articlesRouter.post(`/add`, async (req, res) => {
     logger.error(`Error happened: ${error}`);
   }
 });
-articlesRouter.get(`/category/:id`, (req, res) => res.render(`articles-by-category`, {title: `Статьи по категории`}));
-articlesRouter.get(`/categories`, (req, res) => res.render(`all-categories`, {title: `Категории`}));
+
+articlesRouter.get(`/categories`, async (req, res) => {
+  categories = await getCategories();
+
+  res.render(`all-categories`, {title: `Категории`, categories});
+});
+
+articlesRouter.get(`/category/:id`, async (req, res) => {
+  const {id} = req.params;
+  categories = await getCategories();
+  const selectedCategory = categories[id - 1];
+  const articlesByCategory = await getArticlesByCategory(id);
+
+  res.render(`articles-by-category`, {title: `Статьи по категории`, categories, selectedCategory, articlesByCategory, id, DateTimeFormat});
+});
+
 articlesRouter.get(`/:id`, async (req, res) => {
   const {id} = req.params;
   const article = await getArticle(id);
 
   res.render(`post`, {DateTimeFormat, article, title: `Пост`});
 });
+
 articlesRouter.get(`/edit/:id`, async (req, res) => {
   const {id} = req.params;
   const article = await getArticle(id);
