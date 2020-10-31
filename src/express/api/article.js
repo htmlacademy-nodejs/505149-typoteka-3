@@ -4,7 +4,9 @@ const axios = require(`axios`);
 
 const {getLogger} = require(`../../lib/logger`);
 
-const logger = getLogger();
+const logger = getLogger({
+  name: `api-axios`,
+});
 
 const HOST = process.env.HOST || `http://localhost:3000/`;
 

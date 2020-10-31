@@ -7,7 +7,9 @@ const {dateToTime} = require(`../../lib/utils`);
 
 const {MAX_ID_LENGTH} = require(`../../../src/constants`);
 
-const logger = getLogger();
+const logger = getLogger({
+  name: `api-server`,
+});
 
 class ArticleService {
   constructor(articles) {

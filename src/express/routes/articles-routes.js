@@ -13,7 +13,9 @@ const {dateToTime} = require(`../../lib/utils`);
 
 const articlesRouter = new Router();
 
-const logger = getLogger();
+const logger = getLogger({
+  name: `front-server-formidable`,
+});
 
 let categories = [];
 

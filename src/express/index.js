@@ -9,7 +9,9 @@ const searchRoutes = require(`./routes/search-routes`);
 const mainRoutes = require(`./routes/main-routes`);
 const {getLogger} = require(`../lib/logger`);
 
-const logger = getLogger();
+const logger = getLogger({
+  name: `front-server`,
+});
 
 const app = express();
 const port = 8080;

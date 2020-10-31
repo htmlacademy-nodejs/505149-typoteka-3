@@ -6,7 +6,9 @@ const {DateTimeFormat} = require(`intl`);
 const {getLogger} = require(`../../lib/logger`);
 const {getRandomInt, shuffle, makeMockData, DateRestrict, TXT_FILES_DIR} = require(`../../utils`);
 
-const logger = getLogger();
+const logger = getLogger({
+  name: `api-server-sql`,
+});
 
 const FILE_NAME = `fill-db.sql`;
 const DEFAULT_COUNT = 3;

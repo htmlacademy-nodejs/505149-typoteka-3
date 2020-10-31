@@ -4,7 +4,9 @@ const fs = require(`fs`).promises;
 
 const {getLogger} = require(`./lib/logger`);
 
-const logger = getLogger();
+const logger = getLogger({
+  name: `api-server-utils`,
+});
 
 const TimeConstants = {
   MS: 1000,

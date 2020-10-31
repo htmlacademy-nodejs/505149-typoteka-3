@@ -9,7 +9,9 @@ const commentValidator = require(`../middlewares/comment-validator`);
 const {getLogger} = require(`../../lib/logger`);
 
 const route = new Router();
-const logger = getLogger();
+const logger = getLogger({
+  name: `api-server`,
+});
 
 module.exports = (app, articleService, commentService) => {
   app.use(`/articles`, route);
