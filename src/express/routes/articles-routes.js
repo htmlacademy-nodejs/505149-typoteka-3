@@ -14,14 +14,13 @@ const logger = getLogger({
   name: `front-server-formidable`,
 });
 
-let categories = [];
-
 articlesRouter.get(`/add`, async (req, res) => {
-  categories = await api.getCategories();
+  const categories = await api.getCategories();
   res.render(`new-post`, {DateTimeFormat, title: `Публикация`, categories});
 });
 
 articlesRouter.post(`/add`, async (req, res) => {
+  const categories = await api.getCategories();
   const allowedTypes = [`image/jpeg`, `image/png`];
   let isAllowedFormat;
   let article = {category: []};
@@ -83,14 +82,14 @@ articlesRouter.post(`/add`, async (req, res) => {
 });
 
 articlesRouter.get(`/categories`, async (req, res) => {
-  categories = await api.getCategories();
+  const categories = await api.getCategories();
 
   res.render(`all-categories`, {title: `Категории`, categories});
 });
 
 articlesRouter.get(`/category/:id`, async (req, res) => {
   const {id} = req.params;
-  categories = await api.getCategories();
+  const categories = await api.getCategories();
   const selectedCategory = categories[id - 1];
   const articlesByCategory = await api.getArticlesByCategory(id);
 
@@ -100,13 +99,14 @@ articlesRouter.get(`/category/:id`, async (req, res) => {
 articlesRouter.get(`/:id`, async (req, res) => {
   const {id} = req.params;
   const article = await api.getArticle(id);
-  categories = await api.getCategories();
+  const categories = await api.getCategories();
 
   res.render(`post`, {DateTimeFormat, article, title: `Пост`, categories});
 });
 
 articlesRouter.get(`/edit/:id`, async (req, res) => {
   const {id} = req.params;
+  const categories = await api.getCategories();
   const article = await api.getArticle(id);
   if (categories.length === 0) {
     categories = await api.getCategories();
