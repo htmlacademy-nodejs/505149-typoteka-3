@@ -1,4 +1,4 @@
-extends layouts/layout.pug
+extends layout.pug
 
 block content
   .wrapper-color
@@ -9,7 +9,7 @@ block content
       button.button.button--colored.header__button-new Новая запись
       .header__dropdown
         a.button.button--burger.header__burger(href='#') Открыть меню
-        include ./layouts/burger.pug
+        include ./partials/burger.pug
       a.header__search.button.button--search(href='/search' aria-label='поиск по сайту')
     main
       section.search-page
