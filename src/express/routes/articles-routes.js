@@ -3,12 +3,17 @@
 const {Router} = require(`express`);
 const {DateTimeFormat} = require(`intl`);
 const formidable = require(`formidable`);
+const path = require(`path`);
 
 const {getLogger} = require(`../../lib/logger`);
 const {dateToTime} = require(`../../lib/utils`);
 const api = require(`../api`).getAPI();
 
+const UPLOAD_DIR = `../upload/img/`;
+
 const articlesRouter = new Router();
+
+const uploadDirAbsolute = path.resolve(__dirname, UPLOAD_DIR);
 
 const logger = getLogger({
   name: `front-server-formidable`,
@@ -40,7 +45,7 @@ articlesRouter.post(`/add`, async (req, res) => {
           isAllowedFormat = false;
         } else {
           isAllowedFormat = true;
-          file.path = process.cwd() + `/src/express/files/img/` + file.name;
+          file.path = uploadDirAbsolute + `/` + file.name;
         }
       })
       .on(`file`, (name, file) => {
