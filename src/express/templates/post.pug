@@ -27,8 +27,9 @@ block content
               h2.post__title.title.title--main= article.title
               ul.post__themes.themes
                 each category in article.category
+                  - var index = categories.findIndex((it) => it === category)
                   li.themes__item
-                    a.themes__item-link(href='#')
+                    a.themes__item-link(href=`/articles/category/${index + 1}`)
                       | #{category}
                       sup  88
                     button.themes__remove-btn(type='button') Удалить категорию
@@ -38,7 +39,7 @@ block content
               p #{article.announce}
               p #{article.fullText}
         .post__wrapper.post__wrapper--comments
-          section.post__comments.comments
+          section.post__comments.comments#postcomments
             h2.comments__title.title.title--middle Комментарии
             ul.comments__list
               each comment in article.comments
