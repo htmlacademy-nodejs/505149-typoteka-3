@@ -28,9 +28,13 @@ const createApp = async () => {
   app.use(`/api`, apiRoutes);
 
   app.use((req, res) => {
-    logger.error(`Did not find url: ${req.url}`);
+    logger.error(`Route was not found: ${req.url}`);
     return res.status(HttpCode.NOT_FOUND)
-      .send(`Not found`);
+      .send(`Route was not found: ${req.url}`);
+  });
+
+  app.use((err, _req, _res, _next) => {
+    logger.error(`An error occured on processing request: ${err.message}`);
   });
 
   return app;
