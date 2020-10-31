@@ -10,7 +10,7 @@ const searchRouter = new Router();
 searchRouter.get(`/`, async (req, res) => res.render(`search`, {title: `Поиск`}));
 
 searchRouter.get(`/results`, async (req, res) => {
-  const query = req.query.search;
+  const query = req.query.query;
   const encodedURI = encodeURI(query);
   const message = query ? `Ничего не найдено` : `Пустой запрос`;
 

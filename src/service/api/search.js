@@ -14,15 +14,15 @@ module.exports = (app, service) => {
   app.use(`/search`, route);
 
   route.get(`/`, (req, res) => {
-    const {search = ``} = req.query;
+    const {query = ``} = req.query;
 
-    if (!search) {
+    if (!query) {
       logger.error(`Empty query...`);
       res.status(HttpCode.BAD_REQUEST).json(null);
       return;
     }
 
-    const searchResults = service.findAll(search.toLowerCase());
+    const searchResults = service.findAll(query.toLowerCase());
 
     if (searchResults.length) {
       res.status(HttpCode.OK).json(searchResults);

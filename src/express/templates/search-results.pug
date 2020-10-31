@@ -18,7 +18,7 @@ block content
           .search.search-page__form
             form(action='/search/results/' method='get')
               label
-                input(type='search' name='search' placeholder='Что ищем?' value= query)
+                input(type='search' name='query' placeholder='Что ищем?' value= query)
               button.search__button.button.button--transparent(type='submit') Найти
             each article in articles
               .search__result
