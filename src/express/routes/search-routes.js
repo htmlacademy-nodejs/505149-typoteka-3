@@ -3,7 +3,7 @@
 const {Router} = require(`express`);
 const {DateTimeFormat} = require(`intl`);
 
-const getSearchResults = require(`../api/search`);
+const api = require(`../api`).getAPI();
 
 const searchRouter = new Router();
 
@@ -14,7 +14,7 @@ searchRouter.get(`/results`, async (req, res) => {
   const encodedURI = encodeURI(query);
   const message = query ? `Ничего не найдено` : `Пустой запрос`;
 
-  const articles = await getSearchResults(encodedURI);
+  const articles = await api.search(encodedURI);
 
   if (articles) {
     res.render(`search-results`, {articles, title: `Найдено`, query, DateTimeFormat});

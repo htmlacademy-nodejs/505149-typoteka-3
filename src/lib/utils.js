@@ -1,9 +1,9 @@
 'use strict';
 
-const getComments = require(`../express/api/comments`);
+const api = require(`../express/api`).getAPI();
 
 module.exports.getSortedByDateComments = async (articlesId) => {
-  return await Promise.all(articlesId.map((id) => getComments(id)))
+  return await Promise.all(articlesId.map((id) => api.getComments(id)))
       .then((results) => results.flat().sort((a, b) => (new Date(b.date)) - (new Date(a.date))));
 };
 

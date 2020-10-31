@@ -18,7 +18,7 @@ module.exports = (app, service) => {
 
     if (!query) {
       logger.error(`Empty query...`);
-      res.status(HttpCode.BAD_REQUEST).json(null);
+      res.status(HttpCode.BAD_REQUEST).send(null);
       return;
     }
 

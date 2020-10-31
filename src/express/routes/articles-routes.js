@@ -4,12 +4,9 @@ const {Router} = require(`express`);
 const {DateTimeFormat} = require(`intl`);
 const formidable = require(`formidable`);
 
-const getArticle = require(`../api/article`);
-const getCategories = require(`../api/categories`);
-const getArticlesByCategory = require(`../api/category`);
-const postArticle = require(`../api/new-article`);
 const {getLogger} = require(`../../lib/logger`);
 const {dateToTime} = require(`../../lib/utils`);
+const api = require(`../api`).getAPI();
 
 const articlesRouter = new Router();
 
@@ -20,7 +17,7 @@ const logger = getLogger({
 let categories = [];
 
 articlesRouter.get(`/add`, async (req, res) => {
-  categories = await getCategories();
+  categories = await api.getCategories();
   res.render(`new-post`, {DateTimeFormat, title: `Публикация`, categories});
 });
 
@@ -64,7 +61,7 @@ articlesRouter.post(`/add`, async (req, res) => {
 
         article.picture = ``;
         if (categories.length === 0) {
-          categories = await getCategories();
+          categories = await api.getCategories();
         }
 
         res.render(`new-post`, {article, DateTimeFormat, title: `Публикация`, categories});
@@ -74,7 +71,7 @@ articlesRouter.post(`/add`, async (req, res) => {
           article.createdDate = new DateTimeFormat(`ru-Ru`, {day: `numeric`, month: `numeric`, year: `numeric`, hour: `numeric`, minute: `numeric`, second: `numeric`}).format(Date.now());
         }
         if (isAllowedFormat) {
-          await postArticle(article);
+          await api.createArticle(article);
           res.redirect(`/my`);
         } else {
           formData.emit(`error`, `Not correct file's extension.`);
@@ -86,33 +83,33 @@ articlesRouter.post(`/add`, async (req, res) => {
 });
 
 articlesRouter.get(`/categories`, async (req, res) => {
-  categories = await getCategories();
+  categories = await api.getCategories();
 
   res.render(`all-categories`, {title: `Категории`, categories});
 });
 
 articlesRouter.get(`/category/:id`, async (req, res) => {
   const {id} = req.params;
-  categories = await getCategories();
+  categories = await api.getCategories();
   const selectedCategory = categories[id - 1];
-  const articlesByCategory = await getArticlesByCategory(id);
+  const articlesByCategory = await api.getArticlesByCategory(id);
 
   res.render(`articles-by-category`, {title: `Статьи по категории`, categories, selectedCategory, articlesByCategory, id, DateTimeFormat});
 });
 
 articlesRouter.get(`/:id`, async (req, res) => {
   const {id} = req.params;
-  const article = await getArticle(id);
-  categories = await getCategories();
+  const article = await api.getArticle(id);
+  categories = await api.getCategories();
 
   res.render(`post`, {DateTimeFormat, article, title: `Пост`, categories});
 });
 
 articlesRouter.get(`/edit/:id`, async (req, res) => {
   const {id} = req.params;
-  const article = await getArticle(id);
+  const article = await api.getArticle(id);
   if (categories.length === 0) {
-    categories = await getCategories();
+    categories = await api.getCategories();
   }
 
   if (article) {
