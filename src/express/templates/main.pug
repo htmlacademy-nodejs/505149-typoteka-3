@@ -22,34 +22,12 @@ block content
       section.main-page__theme-list
         h2.visually-hidden Список тем
         ul.themes
-          li.themes__item
-            a.themes__item-link(href='#')
-              | Автомобили
-              sup 88
-          li.themes__item
-            a.themes__item-link(href='#')
-              | Удаленная работа
-              sup 13
-          li.themes__item
-            a.themes__item-link(href='#')
-              | Бизнес
-              sup 13
-          li.themes__item
-            a.themes__item-link(href='#')
-              | Путешествия
-              sup 13
-          li.themes__item
-            a.themes__item-link.themes__item-link--padding(href='#')
-              | Дизайн и обустройство
-              sup 13
-          li.themes__item
-            a.themes__item-link(href='#')
-              | Производство игрушек
-              sup 22
-          li.themes__item
-            a.themes__item-link(href='#')
-              | UX & UI
-              sup 22
+          each category in categories
+            - var index = categories.findIndex((it) => it === category)
+            li.themes__item
+              a.themes__item-link(href=`/articles/category/${index + 1}`)
+                | #{category}
+                sup 88
       .main-page__section-flex
         section.main-page__hot.hot
           h2.hot__name
@@ -58,7 +36,7 @@ block content
           ul.hot__list
             each article in sortedByQtyOfComments
               li.hot__list-item
-                a.hot__list-link(href='#')
+                a.hot__list-link(href=`/articles/${article.id}`)
                   | #{article.title}
                   sup.hot__link-sup #{article.comments.length}
         section.main-page__last.last
@@ -70,7 +48,7 @@ block content
               li.last__list-item
                 img.last__list-image(src='/img/avatar-small-1.png' width='20' height='20' alt='Аватар пользователя')
                 b.last__list-name Анна Артамонова
-                a.last__list-link(href='#')= comment.text
+                a.last__list-link(href=`/articles/${comment.articleId}`)= comment.text
       section.main-page__list.preview
         h2.visually-hidden Список превью статей
         ul.preview__list

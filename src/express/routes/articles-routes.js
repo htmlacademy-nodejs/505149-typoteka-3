@@ -101,8 +101,9 @@ articlesRouter.get(`/category/:id`, async (req, res) => {
 articlesRouter.get(`/:id`, async (req, res) => {
   const {id} = req.params;
   const article = await getArticle(id);
+  categories = await getCategories();
 
-  res.render(`post`, {DateTimeFormat, article, title: `Пост`});
+  res.render(`post`, {DateTimeFormat, article, title: `Пост`, categories});
 });
 
 articlesRouter.get(`/edit/:id`, async (req, res) => {
