@@ -5,8 +5,7 @@ const express = require(`express`);
 const {HttpCode} = require(`../../constants`);
 const createApi = require(`../api`);
 const {getLogger} = require(`../../lib/logger`);
-
-const DEFAULT_PORT = 3000;
+const {API_PORT} = require(`../../../config`);
 
 const logger = getLogger({
   name: `api-server`,
@@ -46,7 +45,7 @@ module.exports = {
   async run(args) {
     const app = await createApp();
     const [customPort] = args;
-    const port = Number.parseInt(customPort, 10) || DEFAULT_PORT;
+    const port = Number.parseInt(customPort, 10) || API_PORT;
 
     app.listen(port, (err) => {
       if (err) {
