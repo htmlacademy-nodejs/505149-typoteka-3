@@ -4,7 +4,7 @@ block content
   .wrapper
     header.header
       a.header__logo.logo(href='/')
-        img.logo__image(src='/img/icons/logo-image-only.svg' alt='логотип Тайпотеки')
+        img.logo__image(src='/img/icons/logo-image-only.svg' alt='Логотип Тайпотеки')
         span.logo__name Типотека
       button.button.button--colored.header__button-new Новая запись
       .header__dropdown
@@ -12,8 +12,8 @@ block content
         include ./partials/burger.pug
       a.header__search.button.button--search(href='/search' aria-label='поиск по сайту')
     main
-      section.modal.modal--flex
-        .popup.popup--new-publication.popup--flex
+      section
+        .popup.popup--new-publication.popup--anti
           .new-publication
             form(action='/articles/add' method='post' enctype='multipart/form-data')
               .new-publication__header
@@ -25,7 +25,7 @@ block content
                       label(for='new-publication-date' aria-label='Календарь')
                       input#new-publication-date(type='text' name='createdDate' value=(article && article.createdDate ? `${new DateTimeFormat(`ru-Ru`, {day: `numeric`, month: `numeric`, year: `numeric`}).format(new Date(article.createdDate))}` : '') placeholder= (article && article.createdDate ? `${new DateTimeFormat(`ru-Ru`, {day: `numeric`, month: `numeric`, year: `numeric`}).format(new Date(article.createdDate))}` : `${new DateTimeFormat(`ru-Ru`, {day: `numeric`, month: `numeric`, year: `numeric`}).format(new Date())}`))
                 button.new-publication__button.button.button--colored(type='submit') Опубликовать
-              button.popup__button.button.button--popup-close(type='button' aria-label='Закрыть окно') Закрыть окно
+              a.popup__button.button.button--popup-close(aria-label='Закрыть окно') Закрыть окно
               .new-publication__form.form
                 .form__wrapper.form__wrapper--intro
                   .form__field
@@ -33,24 +33,25 @@ block content
                       input(type='text' name='title' placeholder='Заголовок' value=(article && article.title ? article.title : '') required)
                   .form__field.form__field--post-image
                     label
-                      input#image-name-field(type='text' value=(article && article.picture ? article.picture : '') placeholder='Фотография' readonly)
+                      input#image-name-field(type='text' name='photo' value=(article && article.picture ? article.picture : '') placeholder='Фотография' readonly)
                     .form__image-loader.form__image-loader--publication
                       input#file-picture.visually-hidden(type='file' name='picture')
                       label(for='file-picture')
                         | Обзор
                     button.button.button--transparent Удалить
-                  .new-publication__checkbox
-                    each category, index in categories
-                      input(id=('category-checkbox-' + index) type='checkbox' name='category' value=category checked=(article && article.category ? article.category.includes(category) : false))
-                      label(for=('category-checkbox-' + index)) #{category}
-                  a.new-publication__form-link.button.button--transparent(href='#') Добавить категорию
+                  .new-publication__category-wrapper
+                    .new-publication__checkbox.new-publication__checkbox--auto
+                      each category, index in categories
+                        input(id=('category-checkbox-' + index) type='checkbox' name=('category-' + index) value=category checked=(article && article.category ? article.category.includes(category) : false))
+                        label(for=('category-checkbox-' + index)) #{category}
+                    a.new-publication__form-link.button.button--transparent(href='#') Добавить категорию
                 .form__wrapper.form__wrapper--text
                   .form__field.form__field--publication-text
                     label
-                      textarea(rows='1' name='announce' placeholder='Анонс публикации')
+                      textarea(rows='5' name='announce' placeholder='Анонс публикации')
                         | #{article && article.announce ? article.announce : ''}
                   .form__field.form__field--publication-text
                     label
-                      textarea(rows='15' name='fullText' placeholder='Полный текст публикации')
+                      textarea(rows='10' name='fullText' placeholder='Полный текст публикации')
                         | #{article && article.fullText ? article.fullText : ''}
-        .modal__overlay
+    include partials/footer.pug
