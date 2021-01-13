@@ -2,6 +2,10 @@
 
 const Sequelize = require(`sequelize`);
 
+const {createUserModel, createUserLinks} = require(`./models/user`);
+const {createArticleModel, createArticleLinks} = require(`./models/article`);
+const {createCategoryModel, createCategoryLinks} = require(`./models/category`);
+const {createCommentModel, createCommentLinks} = require(`./models/comment`);
 const {getLogger} = require(`../../lib/logger`);
 const {DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, DB_DIALECT} = require(`../../../config`);
 
@@ -27,6 +31,20 @@ const sequelize = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
   }
 });
 
+const User = createUserModel(sequelize);
+const Article = createArticleModel(sequelize);
+const Category = createCategoryModel(sequelize);
+const Comment = createCommentModel(sequelize);
+
+createUserLinks(Article, User, Comment);
+createArticleLinks(Article, User, Category, Comment);
+createCategoryLinks(Article, Category);
+createCommentLinks(Comment, User, Article);
+
 module.exports = {
   sequelize,
+  User,
+  Article,
+  Category,
+  Comment,
 };
