@@ -9,11 +9,19 @@ class CategoryService {
   async findAll() {
     const {Category} = this._models;
 
-    return await Category.findAll({raw: true});
+    try {
+      const categories = await Category.findAll({raw: true});
+
+      return categories;
+    } catch (error) {
+      this._logger.error(`Can not find categories. Error: ${error}`);
+
+      return null;
+    }
   }
 
   async findOne(id) {
-    const {Category} = this._db.models;
+    const {Category} = this._models;
     const categoryId = Number.parseInt(id, 10);
 
     try {

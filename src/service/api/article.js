@@ -82,7 +82,7 @@ module.exports = (app, articleService, commentService) => {
   route.get(`/:articleId/comments`, articleExist(articleService), async (req, res) => {
     const {article} = res.locals;
 
-    const comments = await commentService.findAll(article);
+    const comments = await commentService.findAll(article.id);
 
     if (!comments) {
       logger.error(`Error status - ${HttpCode.NOT_FOUND}`);
@@ -94,9 +94,8 @@ module.exports = (app, articleService, commentService) => {
   });
 
   route.delete(`/:articleId/comments/:commentId`, articleExist(articleService), async (req, res) => {
-    const {article} = res.locals;
     const {commentId} = req.params;
-    const deletedComment = await commentService.delete(article, commentId);
+    const deletedComment = await commentService.delete(commentId);
 
     if (!deletedComment) {
       logger.error(`Did not find comment with ${commentId}`);
@@ -110,7 +109,7 @@ module.exports = (app, articleService, commentService) => {
 
   route.post(`/:articleId/comments`, [articleExist(articleService), commentValidator], async (req, res) => {
     const {article} = res.locals;
-    const comment = await commentService.create(article, req.body);
+    const comment = await commentService.create(article.id, req.body);
 
     if (!comment) {
       logger.error(`Error status - ${HttpCode.INTERNAL_SERVER_ERROR}`);

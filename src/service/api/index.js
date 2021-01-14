@@ -17,7 +17,7 @@ const createApi = async (db, logger) => {
   const agregatingRouter = new Router();
 
   category(agregatingRouter, new CategoryService(db, logger), new ArticleService(db, logger));
-  article(agregatingRouter, new ArticleService(db, logger), new CommentService());
+  article(agregatingRouter, new ArticleService(db, logger), new CommentService(db, logger));
   search(agregatingRouter, new SearchService(db, logger));
 
   return agregatingRouter;

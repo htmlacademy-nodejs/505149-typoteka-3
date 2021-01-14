@@ -47,7 +47,7 @@ CREATE TABLE articles
     id bigserial NOT NULL,
     title character varying(100) NOT NULL,
     announce character varying(500) NOT NULL,
-    fullText character varying(5000) NOT NULL,
+    fulltext character varying(5000) NOT NULL,
     picture character varying(500),
     created_date DATE NOT NULL,
     user_id bigint NOT NULL,

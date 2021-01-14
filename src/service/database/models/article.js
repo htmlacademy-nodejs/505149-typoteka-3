@@ -7,7 +7,7 @@ module.exports = {
     class Article extends Model {}
 
     Article.init({
-      type: {
+      title: {
         type: DataTypes.STRING,
         allowNull: false,
       },

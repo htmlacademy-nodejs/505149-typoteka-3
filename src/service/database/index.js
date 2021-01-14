@@ -43,8 +43,10 @@ createCommentLinks(Comment, User, Article);
 
 module.exports = {
   sequelize,
-  User,
-  Article,
-  Category,
-  Comment,
+  models: {
+    User,
+    Article,
+    Category,
+    Comment,
+  },
 };

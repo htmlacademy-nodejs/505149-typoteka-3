@@ -30,8 +30,8 @@ const generateArticles = (count, mockData) => {
     id: nanoid(MAX_ID_LENGTH),
     title: mockData.titles[getRandomInt(0, mockData.titles.length - 1)],
     announce: shuffle(mockData.sentences).slice(0, getRandomInt(1, 3)).join(` `),
-    fullText: shuffle(mockData.sentences).slice(0, getRandomInt(1, mockData.sentences.length - 1)).join(` `),
-    createdDate: new Date(getRandomInt(DateRestrict.min, DateRestrict.max)).toISOString(),
+    fulltext: shuffle(mockData.sentences).slice(0, getRandomInt(1, mockData.sentences.length - 1)).join(` `),
+    [`created_date`]: new Date(getRandomInt(DateRestrict.min, DateRestrict.max)).toISOString(),
     category: shuffle(mockData.categories).slice(0, getRandomInt(1, mockData.categories.length - 3)),
     comments: generateComments(getRandomInt(1, MAX_COMMENTS), mockData.comments),
     picture: `sea-fullsize@1x.jpg`,
@@ -39,7 +39,7 @@ const generateArticles = (count, mockData) => {
 
   for (const article of array) {
     article.comments.forEach((comment) => {
-      comment.articleId = article.id;
+      comment[`article_id`] = article.id;
     });
   }
 

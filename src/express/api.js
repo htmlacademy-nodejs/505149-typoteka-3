@@ -24,8 +24,12 @@ class API {
   }
 
   async getArticle(id) {
-    const {data: article} = await axios.get(`${this._baseUrl}articles/${id}`);
-    return article;
+    try {
+      const {data: article} = await axios.get(`${this._baseUrl}articles/${id}`);
+      return article;
+    } catch (error) {
+      return logger.error(`Did not find article: ${error.message}`);
+    }
   }
 
   async search(query) {

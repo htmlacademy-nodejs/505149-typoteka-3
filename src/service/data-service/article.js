@@ -39,8 +39,10 @@ class ArticleService {
 
     try {
       const article = await Article.findByPk(articleId);
+      const comments = await article.getComments({raw: true});
       const categories = await article.getCategories({raw: true});
       article.dataValues.category = categories;
+      article.dataValues.comments = comments;
 
       return article.dataValues;
     } catch (error) {
@@ -50,9 +52,9 @@ class ArticleService {
     }
   }
 
-  async findByCategory(category) {
+  async findByCategory(id) {
     const articles = await this.findAll();
-    return articles.filter((article) => article.category.includes(category));
+    return articles.filter((article) => article.category.find((category) => category.id === id));
   }
 
   async create(article) {

@@ -22,8 +22,8 @@ block content
               button.search__button.button.button--transparent(type='submit') Найти
             each article in articles
               .search__result
-                time.search__date(datetime=article.createdTime)
-                  +time(new Date(article.createdDate))
+                time.search__date(datetime=article[`created_date`])
+                  +time(new Date(article[`created_date`]))
                 a.search__link(href=`/articles/${article.id}`)
                   |  #{article.title}
     include partials/footer.pug

@@ -9,8 +9,8 @@ const articleMock = {
   "id": `1`,
   "title": `Title`,
   "announce": `Some text`,
-  "fullText": `Some very long text`,
-  "createdDate": `25.03.2020, 23:14:51`,
+  "fulltext": `Some very long text`,
+  "created_date": `25.03.2020, 23:14:51`,
   "category": [
     `Программирование`,
   ],
@@ -77,8 +77,8 @@ describe(`Article API end-points:`, () => {
         "id": `1`,
         "title": `New title`,
         "announce": `Some text`,
-        "fullText": `Some very long text`,
-        "createdDate": `25.03.2020, 23:14:51`,
+        "fulltext": `Some very long text`,
+        "created_date": `25.03.2020, 23:14:51`,
         "category": [
           `Программирование`,
         ],
@@ -110,8 +110,8 @@ describe(`Article API end-points:`, () => {
       "id": `1`,
       "title": `New title`,
       "announce": `Some text`,
-      "fullText": `Some very long text`,
-      "createdDate": `25.03.2020, 23:14:51`,
+      "fulltext": `Some very long text`,
+      "created_date": `25.03.2020, 23:14:51`,
       "category": [
         `Программирование`,
       ],

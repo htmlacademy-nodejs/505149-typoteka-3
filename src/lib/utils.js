@@ -3,8 +3,8 @@
 const api = require(`../express/api`).getAPI();
 
 module.exports.getSortedByDateComments = async (articlesId) => {
-  return await Promise.all(articlesId.map((id) => api.getComments(id)))
-      .then((results) => results.flat().sort((a, b) => (new Date(b.date)) - (new Date(a.date))));
+  return await Promise.all(articlesId.map(async (id) => await api.getComments(id)))
+      .then((results) => results.flat().sort((a, b) => (new Date(b[`created_date`])) - (new Date(a[`created_date`]))));
 };
 
 module.exports.dateToTime = (template, date) => {

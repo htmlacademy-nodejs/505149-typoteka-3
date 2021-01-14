@@ -26,7 +26,7 @@ myRouter.get(`/comments`, async (req, res) => {
   const articlesId = myArticles.map((it) => it.id);
   const sortedByDateComments = await getSortedByDateComments(articlesId);
   for (const comment of sortedByDateComments) {
-    comment.articleTitle = (await api.getArticle(comment.articleId)).title;
+    comment.articleTitle = (await api.getArticle(comment[`article_id`])).title;
   }
 
   res.render(`comments`, {sortedByDateComments, title: `Комментарии`, DateTimeFormat});

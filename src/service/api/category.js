@@ -21,15 +21,14 @@ module.exports = (app, categoryService, articleService) => {
 
   route.get(`/:id`, async (req, res) => {
     const {id} = req.params;
-    const category = await categoryService.findOne(id);
 
-    if (!category) {
-      logger.error(`Did not find category with ${id}`);
+    const articlesByCategory = await articleService.findByCategory(id);
+
+    if (!articlesByCategory) {
+      logger.error(`Did not find articles with category ${id}`);
       return res.status(HttpCode.NOT_FOUND)
-        .send(`Did not find category with ${id}`);
+        .send(`Did not find articles with category ${id}`);
     }
-
-    const articlesByCategory = await articleService.findByCategory(category);
 
     return res.status(HttpCode.OK)
       .json(articlesByCategory);
