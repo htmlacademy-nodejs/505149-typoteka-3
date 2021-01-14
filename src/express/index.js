@@ -8,6 +8,7 @@ const articlesRoutes = require(`./routes/articles-routes`);
 const searchRoutes = require(`./routes/search-routes`);
 const mainRoutes = require(`./routes/main-routes`);
 const {getLogger} = require(`../lib/logger`);
+const {APP_PORT} = require(`../../config`);
 
 const PUBLIC_DIR = `files`;
 const UPLOAD_DIR = `upload`;
@@ -17,7 +18,6 @@ const logger = getLogger({
 });
 
 const app = express();
-const port = 8080;
 app.use(express.urlencoded({extended: false}));
 app.use(express.static(path.join(__dirname, PUBLIC_DIR)));
 app.use(express.static(path.join(__dirname, UPLOAD_DIR)));
@@ -39,10 +39,10 @@ app.use((err, req, res, _next) => {
   res.render(`errors/500`, {title: `Ошибка сервера`});
 });
 
-app.listen(port, (err) => {
+app.listen(APP_PORT, (err) => {
   if (err) {
     return logger.error(`Ошибка при создании сервера: ${err}`);
   }
 
-  return logger.info(`Ожидаю соединений на ${port} порт`);
+  return logger.info(`Ожидаю соединений на ${APP_PORT} порт`);
 });

@@ -25,8 +25,8 @@ mainRouter.get(`/`, async (req, res) => {
   });
 });
 
-mainRouter.get(`/register`, (req, res) => res.render(`login`, {isItLogin: false, title: `Регистрация`}));
+mainRouter.get(`/registration`, (req, res) => res.render(`registration`, {title: `Регистрация`}));
 
-mainRouter.get(`/login`, (req, res) => res.render(`login`, {isItLogin: true, title: `Войти`}));
+mainRouter.get(`/login`, (req, res) => res.render(`login`, {title: `Войти`}));
 
 module.exports = mainRouter;

@@ -5,7 +5,7 @@ block content
     header.header
       a.header__logo.logo(href='/')
         img(src='/img/icons/logo.svg' alt='логотип Тайпотеки')
-      a.header__registration(href='/register') Регистрация
+      a.header__registration(href='/registration') Регистрация
       a.header__enter(href='/login') Вход с паролем
       a.header__search.button.button--search(href='/search' aria-label='поиск по сайту')
     main.articles-category
@@ -20,7 +20,7 @@ block content
                 sup  88
       section.articles-category__list.preview
         h2.visually-hidden Список превью статей
-        ul.preview__list
+        ul(class=`${articlesByCategory.length === 1 ? `preview__list-one` : `preview__list`}`)
           each article in articlesByCategory
             li.preview__item
               ul.preview__breadcrumbs
@@ -40,3 +40,4 @@ block content
                 span.preview__cloud
                 |
                 b.preview__comment-count= article.comments.length
+    include partials/footer.pug
