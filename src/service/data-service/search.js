@@ -1,13 +1,24 @@
 'use strict';
 
 class SearchService {
-  constructor(articles) {
-    this._articles = articles;
+  constructor(db, logger) {
+    this._models = db.models;
+    this._logger = logger;
   }
 
-  findAll(searchText) {
-    return this._articles.
-      filter((article) => article.title.toLowerCase().includes(searchText));
+  async findAll(searchText) {
+    const {Article} = this._models;
+
+    const articles = await Article.findAll();
+    const preparedArticles = [];
+
+    for (const article of articles) {
+      const categories = await article.getCategories({raw: true});
+      article.dataValues.category = categories;
+      preparedArticles.push(article.dataValues);
+    }
+
+    return preparedArticles.filter((article) => article.title.toLowerCase().includes(searchText));
   }
 }
 
