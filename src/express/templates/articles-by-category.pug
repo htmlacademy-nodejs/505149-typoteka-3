@@ -20,7 +20,7 @@ block content
                 sup  88
       section.articles-category__list.preview
         h2.visually-hidden Список превью статей
-        ul.preview__list
+        ul(class=`${articlesByCategory.length === 1 ? `preview__list-one` : `preview__list`}`)
           each article in articlesByCategory
             li.preview__item
               ul.preview__breadcrumbs
