@@ -6,7 +6,7 @@ const {createApp} = require(`../cli/server`);
 const {sequelize} = require(`../database`);
 const {HttpCode, ExitCode} = require(`../../constants`);
 
-const articleMock = {
+const mockArticle = {
   "title": `Title`,
   "announce": `Some text`,
   "fulltext": `Some very long text`,
@@ -55,7 +55,7 @@ describe(`Article API end-points:`, () => {
   test(`status code for POST article request should be 201`, async () => {
     res = await request(app)
       .post(`/api/articles`)
-      .send(articleMock);
+      .send(mockArticle);
     newId = res.body.id;
 
     expect(res.statusCode).toBe(HttpCode.CREATED);
@@ -118,7 +118,7 @@ describe(`Article comments API end-points`, () => {
   test(`status code after POST comment request should be 201`, async () => {
     res = await request(app)
       .post(`/api/articles`)
-      .send(articleMock);
+      .send(mockArticle);
     newId = res.body.id;
 
     res = await request(app)
