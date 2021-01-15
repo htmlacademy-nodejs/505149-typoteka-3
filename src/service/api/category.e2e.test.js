@@ -3,15 +3,24 @@
 const request = require(`supertest`);
 
 const {createApp} = require(`../cli/server`);
-const {HttpCode} = require(`../../constants`);
+const {sequelize} = require(`../database`);
+const {HttpCode, ExitCode} = require(`../../constants`);
 
 describe(`Categories API end-points:`, () => {
   let app = null;
   let res;
 
   beforeAll(async () => {
-    app = await createApp();
-    res = await request(app).get(`/api/categories`);
+    try {
+      app = await createApp();
+      res = await request(app).get(`/api/categories`);
+    } catch (error) {
+      process.exit(ExitCode.error);
+    }
+  });
+
+  afterAll(() => {
+    sequelize.close();
   });
 
   test(`status code of get query should be 200`, async () => {
@@ -22,8 +31,8 @@ describe(`Categories API end-points:`, () => {
     expect(res.body.length).toBeGreaterThan(0);
   });
 
-  test(`each item of output have to be string`, () => {
+  test(`each item's title of output have to be string`, () => {
     expect(Array.isArray(res.body)).toBeTruthy();
-    expect(res.body.every((it) => typeof it === `string`)).toBeTruthy();
+    expect(res.body.every((it) => typeof it.title === `string`)).toBeTruthy();
   });
 });
