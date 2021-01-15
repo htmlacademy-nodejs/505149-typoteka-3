@@ -53,8 +53,9 @@ class ArticleService {
   }
 
   async findByCategory(id) {
+    const categoryId = Number.parseInt(id, 10);
     const articles = await this.findAll();
-    return articles.filter((article) => article.category.find((category) => category.id === id));
+    return articles.filter((article) => article.category.find((category) => category.id === categoryId));
   }
 
   async create(article) {

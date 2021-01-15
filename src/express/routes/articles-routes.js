@@ -57,12 +57,6 @@ articlesRouter.post(`/add`, async (req, res) => {
       .on(`error`, async (err) => {
         logger.error(`There is error while parsing form data. ${err}`);
 
-        if (article[`created_date`]) {
-          article[`created_date`] = new Date(dateToTime(`d.m.y`, article[`created_date`])).toISOString();
-        } else {
-          article[`created_date`] = Date.now();
-        }
-
         article.picture = ``;
         if (categories.length === 0) {
           categories = await api.getCategories();
@@ -72,13 +66,18 @@ articlesRouter.post(`/add`, async (req, res) => {
       })
       .on(`end`, async () => {
         if (!article[`created_date`]) {
-          article[`created_date`] = new DateTimeFormat(`ru-Ru`, {day: `numeric`, month: `numeric`, year: `numeric`, hour: `numeric`, minute: `numeric`, second: `numeric`}).format(Date.now());
+          article[`created_date`] = Date.now();
+        } else {
+          article[`created_date`] = new Date(dateToTime(`d.m.y`, article[`created_date`])).toISOString();
         }
         if (isAllowedFormat) {
-          await api.createArticle(article);
-          res.redirect(`/my`);
+          const result = await api.createArticle(article);
+          if (result) {
+            return res.redirect(`/my`);
+          }
+          return formData.emit(`error`, `Did not create article.`);
         } else {
-          formData.emit(`error`, `Not correct file's extension.`);
+          return formData.emit(`error`, `Not correct file's extension.`);
         }
       });
   } catch (error) {
@@ -94,14 +93,15 @@ articlesRouter.get(`/categories`, async (req, res) => {
 
 articlesRouter.get(`/category/:id`, async (req, res) => {
   const {id} = req.params;
+  const categoryId = Number.parseInt(id, 10);
   const categories = await api.getCategories();
-  const selectedCategory = categories.find((it) => it.id === id);
-  const articlesByCategory = await api.getArticlesByCategory(id);
+  const selectedCategory = categories.find((it) => it.id === categoryId);
+  const articlesByCategory = await api.getArticlesByCategory(categoryId);
 
   if (articlesByCategory.length) {
     res.render(`articles-by-category`, {title: `Статьи по категории`, categories, selectedCategory, articlesByCategory, id, DateTimeFormat});
   } else {
-    res.status(404).render(`errors/404`, {title: `Страница не найдена`, msg: `Нет такой категории`});
+    res.status(404).render(`errors/404`, {title: `Страница не найдена`, msg: `Нет статей такой категории`});
   }
 });
 

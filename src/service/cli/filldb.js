@@ -70,7 +70,6 @@ const fillDataBase = async (categories, comments, articles) => {
     await models.Comment.bulkCreate(comments);
 
     const rawCategories = await models.Category.findAll({raw: true});
-    console.log(rawCategories);
 
     for (const article of articles) {
       const categoriesIds = rawCategories.reduce((acc, item) => {
