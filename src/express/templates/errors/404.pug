@@ -11,6 +11,6 @@ block content
     main
       h1.visually-hidden Ошибка 404
       section.error
-        h2.error__title.title.title--big Похоже ошиблись адресом
+        h2.error__title.title.title--big #{msg ? msg : `Похоже ошиблись адресом`}
         a.error__link.text.text--big(href='/') Вернуться на главную
     include ../partials/footer.pug

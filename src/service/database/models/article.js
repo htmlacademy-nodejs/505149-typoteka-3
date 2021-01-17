@@ -7,16 +7,18 @@ module.exports = {
     class Article extends Model {}
 
     Article.init({
-      type: {
+      title: {
         type: DataTypes.STRING,
         allowNull: false,
       },
       announce: {
-        type: DataTypes.STRING,
+        // eslint-disable-next-line new-cap
+        type: DataTypes.STRING(500),
         allowNull: false,
       },
       fulltext: {
-        type: DataTypes.STRING,
+        // eslint-disable-next-line new-cap
+        type: DataTypes.STRING(5000),
         allowNull: false,
       },
       picture: {

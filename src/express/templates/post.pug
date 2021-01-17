@@ -23,35 +23,35 @@ block content
           .post__wrapper
             .post__head
               a.post__backwards.button.button--backwards(href='#') Назад
-              time.post__date(datetime=article.createdDate)
-                +time(new Date(article.createdDate))
+              time.post__date(datetime=article[`created_date`])
+                +time(new Date(article[`created_date`]))
               h2.post__title.title.title--main= article.title
               ul.post__themes.themes
                 each category in article.category
-                  - var index = categories.findIndex((it) => it === category)
+                  - var index = categories.findIndex((it) => it.title === category.title)
                   li.themes__item
                     a.themes__item-link(href=`/articles/category/${index + 1}`)
-                      | #{category}
+                      | #{category.title}
                       sup  88
                     button.themes__remove-btn(type='button') Удалить категорию
             .post__picture
               img(src=`/img/${article.picture}` alt='пейзаж море, скалы, пляж')
             .post__text
               p #{article.announce}
-              p #{article.fullText}
+              p #{article.fulltext}
         .post__wrapper.post__wrapper--comments
           section.post__comments.comments#postcomments
             h2.comments__title.title.title--middle Комментарии
             ul.comments__list
-              each comment in article.comments
+              each comment in sortedComments
                 li.comments__comment
                   .comments__avatar.avatar
                     img(src='/img/avatar-1.png' alt='аватар пользователя')
                   .comments__text
                     .comments__head
                       p Евгений Петров •
-                      time.comments__date(datetime=comment.date)
-                        +time(new Date(comment.date))
+                      time.comments__date(datetime=comment[`created_date`])
+                        +time(new Date(comment[`created_date`]))
                     p.comments__message= comment.text
             .comments__footer.comments__footer--user
               form(action='#' method='POST')

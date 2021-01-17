@@ -21,6 +21,15 @@ CREATE DATABASE typoteka_blog
     LC_CTYPE = 'C'
     CONNECTION LIMIT = -1;
 
+CREATE DATABASE test_typoteka_blog
+    WITH
+    OWNER = typoteka
+    TEMPLATE = template0
+    ENCODING = 'UTF8'
+    LC_COLLATE = 'C'
+    LC_CTYPE = 'C'
+    CONNECTION LIMIT = -1;
+
 /* There are commands under typoteka user*/
 DROP TABLE IF EXISTS comments;
 DROP TABLE IF EXISTS articles_categories;
@@ -47,7 +56,7 @@ CREATE TABLE articles
     id bigserial NOT NULL,
     title character varying(100) NOT NULL,
     announce character varying(500) NOT NULL,
-    fullText character varying(5000) NOT NULL,
+    fulltext character varying(5000) NOT NULL,
     picture character varying(500),
     created_date DATE NOT NULL,
     user_id bigint NOT NULL,

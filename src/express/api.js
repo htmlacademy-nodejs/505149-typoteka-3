@@ -24,8 +24,12 @@ class API {
   }
 
   async getArticle(id) {
-    const {data: article} = await axios.get(`${this._baseUrl}articles/${id}`);
-    return article;
+    try {
+      const {data: article} = await axios.get(`${this._baseUrl}articles/${id}`);
+      return article;
+    } catch (error) {
+      return logger.error(`Did not find article: ${error.message}`);
+    }
   }
 
   async search(query) {
@@ -48,12 +52,16 @@ class API {
   }
 
   async createArticle(data) {
-    const {data: article} = await axios({
-      method: `post`,
-      url: `${this._baseUrl}articles`,
-      data
-    });
-    return article;
+    try {
+      const {data: article} = await axios({
+        method: `post`,
+        url: `${this._baseUrl}articles`,
+        data
+      });
+      return article;
+    } catch (error) {
+      return logger.error(`Can not create article: ${error.message}`);
+    }
   }
 
   async getComments(id) {

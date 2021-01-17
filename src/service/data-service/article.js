@@ -1,68 +1,156 @@
 'use strict';
 
-const {nanoid} = require(`nanoid`);
-
-const {getLogger} = require(`../../lib/logger`);
-const {dateToTime} = require(`../../lib/utils`);
-
-const {MAX_ID_LENGTH} = require(`../../../src/constants`);
-
-const logger = getLogger({
-  name: `api-server`,
-});
-
 class ArticleService {
-  constructor(articles) {
-    this._articles = articles;
+  constructor(db, logger) {
+    this._db = db;
+    this._logger = logger;
   }
 
-  findAll() {
-    return this._articles;
+  async findAll() {
+    const {Article} = this._db.models;
+
+    try {
+      const articles = await Article.findAll({
+        order: [
+          [`created_date`, `DESC`],
+        ]
+      });
+      const preparedArticles = [];
+
+      for (const article of articles) {
+        const categories = await article.getCategories({raw: true});
+        const comments = await article.getComments({raw: true});
+        article.dataValues.category = categories;
+        article.dataValues.comments = comments;
+        preparedArticles.push(article.dataValues);
+      }
+
+      return preparedArticles;
+    } catch (error) {
+      this._logger.error(`Can not find articles. Error: ${error}`);
+
+      return [];
+    }
   }
 
-  findOne(id) {
-    return this._articles.find((item) => item.id === id);
-  }
+  async findOne(id) {
+    const {Article} = this._db.models;
+    const articleId = Number.parseInt(id, 10);
 
-  findByCategory(category) {
-    return this._articles.filter((article) => article.category.includes(category));
-  }
+    try {
+      const article = await Article.findByPk(articleId);
+      const comments = await article.getComments({raw: true});
+      const categories = await article.getCategories({raw: true});
+      article.dataValues.category = categories;
+      article.dataValues.comments = comments;
 
-  create(article) {
-    const newArticle = Object
-      .assign(
-          {
-            id: nanoid(MAX_ID_LENGTH),
-            comments: [],
-            createdDate: new Date().toISOString(),
-          }, article);
+      return article.dataValues;
+    } catch (error) {
+      this._logger.error(`Can not find article. Error: ${error}`);
 
-    newArticle.createdDate = new Date(dateToTime(`d.m.y`, article.createdDate)).toISOString();
-
-    this._articles.push(newArticle);
-    return newArticle;
-  }
-
-  update(id, article) {
-    const oldArticle = this._articles
-      .find((item) => item.id === id);
-
-    return Object.assign(oldArticle,
-        {
-          createdDate: new Date().toISOString()
-        }, article);
-  }
-
-  delete(id) {
-    const article = this._articles.find((item) => item.id === id);
-
-    if (!article) {
-      logger.error(`Did not find article`);
       return null;
     }
+  }
 
-    this._articles = this._articles.filter((item) => item.id !== id);
-    return article;
+  async findByCategory(id) {
+    const categoryId = Number.parseInt(id, 10);
+    const articles = await this.findAll();
+    return articles.filter((article) => article.category.find((category) => category.id === categoryId));
+  }
+
+  async create(article) {
+    const {sequelize} = this._db;
+    const {Category, Article, User} = this._db.models;
+    const allCategories = await Category.findAll({raw: true});
+    const categoriesIds = allCategories.reduce((acc, item) => {
+      if (article.category.filter((cat) => cat === item.title).length) {
+        acc.push(item.id);
+      }
+      return acc;
+    }, []);
+
+    try {
+      const articleCategories = await Category.findAll({
+        where: {
+          id: {
+            [sequelize.Sequelize.Op.or]: categoriesIds,
+          },
+        }
+      });
+
+      const user = await User.findByPk(1);
+      const newArticle = await user.createArticle(article);
+      await newArticle.addCategories(articleCategories);
+
+      return await Article.findByPk(newArticle.id, {raw: true});
+    } catch (error) {
+      this._logger.error(`Can not create article. Error: ${error}`);
+
+      return null;
+    }
+  }
+
+  async update(id, article) {
+    const {sequelize} = this._db;
+    const {Article, Category} = this._db.models;
+    const allCategories = await Category.findAll({raw: true});
+    const categoriesIds = allCategories.reduce((acc, item) => {
+      if (article.category.filter((cat) => cat === item.title).length) {
+        acc.push(item.id);
+      }
+      return acc;
+    }, []);
+
+    try {
+      const [rows] = await Article.update(article, {
+        where: {
+          id,
+        }
+      });
+
+      if (!rows) {
+        return null;
+      }
+
+      const updatedArticle = await Article.findByPk(id);
+      const articleCategories = await Category.findAll({
+        where: {
+          id: {
+            [sequelize.Sequelize.Op.or]: categoriesIds,
+          },
+        }
+      });
+      await updatedArticle.addCategories(articleCategories);
+      return await Article.findByPk(updatedArticle.id, {raw: true});
+    } catch (error) {
+      this._logger.error(`Can not update article. Error: ${error}`);
+
+      return null;
+    }
+  }
+
+  async delete(id) {
+    const {Article} = this._db.models;
+
+    try {
+      const articleForDelete = await Article.findByPk(id, {raw: true});
+      const deletedRows = await Article.destroy({
+        returning: true,
+        where: {
+          id,
+        }
+      });
+
+      if (!deletedRows) {
+        return null;
+      }
+
+      return articleForDelete;
+    } catch (error) {
+      this._logger.error(`Can not delete article. Error: ${error}`);
+
+      return null;
+    }
   }
 }
 

@@ -9,14 +9,14 @@ block content
       a.header__enter(href='/login') Вход с паролем
       a.header__search.button.button--search(href='/search' aria-label='поиск по сайту')
     main.articles-category
-      h1= selectedCategory
+      h1= selectedCategory.title
       section.articles-category__theme-list
         h2.visually-hidden Список тем
         ul.themes
           each category, index in categories
             li.themes__item
-              a(class=`${selectedCategory === category ? `themes__item-link themes__item-link--active` : `themes__item-link`}` href=`/articles/category/${index + 1}`)
-                | #{category}
+              a(class=`${selectedCategory.title === category.title ? `themes__item-link themes__item-link--active` : `themes__item-link`}` href=`/articles/category/${index + 1}`)
+                | #{category.title}
                 sup  88
       section.articles-category__list.preview
         h2.visually-hidden Список превью статей
@@ -25,13 +25,13 @@ block content
             li.preview__item
               ul.preview__breadcrumbs
                 each category in article.category
-                  - var index = categories.findIndex((it) => it === category)
+                  - var index = categories.findIndex((it) => it.title === category.title)
                   li.preview__breadcrumbs-item
-                    a.preview__breadcrumbs-link(href=`/articles/category/${index + 1}`)= category
+                    a.preview__breadcrumbs-link(href=`/articles/category/${index + 1}`)= category.title
               .preview__background
                 img.preview__background-image(src=`/img/${article.picture}` width='460' height='240' alt=`${article.announce}`)
-              time.preview__time(datetime=article.createdDate)
-                +time(new Date(article.createdDate))
+              time.preview__time(datetime=article[`created_date`])
+                +time(new Date(article[`created_date`]))
               h3.preview__name
                 a.preview__name-link(href=`/articles/${article.id}`)= article.title
               p.preview__text= article.announce

@@ -62,7 +62,7 @@ SELECT
   articles.id AS "ID",
   articles.title AS "Заголовок",
   articles.announce AS "Анонс",
-  articles.fullText AS "Текст",
+  articles.fulltext AS "Текст",
   articles.created_date AS "Дата создания",
   articles.picture AS "Путь к изображению",
   concat(users.first_name, ' ', users.last_name) AS "Имя и фамилия",

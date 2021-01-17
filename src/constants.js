@@ -23,5 +23,6 @@ module.exports.HttpCode = {
 
 module.exports.Env = {
   DEVELOPMENT: `development`,
-  PRODUCTION: `production`
+  PRODUCTION: `production`,
+  TEST: `test`,
 };

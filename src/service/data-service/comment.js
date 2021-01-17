@@ -1,38 +1,63 @@
 'use strict';
 
-const {nanoid} = require(`nanoid`);
-
-const {MAX_ID_LENGTH} = require(`../../constants`);
-
 class CommentService {
-
-  findAll(article) {
-    return article.comments;
+  constructor(db, logger) {
+    this._models = db.models;
+    this._logger = logger;
   }
 
-  delete(article, commentId) {
-    const commentToDelete = article.comments
-      .find((item) => item.id === commentId);
+  async findAll(id) {
+    const {Article} = this._models;
 
-    if (!commentToDelete) {
+    try {
+      const article = await Article.findByPk(id);
+      return await article.getComments({raw: true});
+    } catch (error) {
+      this._logger.error(`Can not find comments of article with id ${id}. Error: ${error}`);
+
       return null;
     }
-
-    article.comments = article.comments
-      .filter((item) => item.id !== commentId);
-
-    return commentToDelete;
   }
 
-  create(article, comment) {
-    const newComment = Object.assign({
-      id: nanoid(MAX_ID_LENGTH),
-      date: new Date().toISOString(),
-      articleId: article.id,
-    }, comment);
+  async delete(commentId) {
+    const {Comment} = this._models;
 
-    article.comments.push(newComment);
-    return comment;
+    try {
+      const commentForDelete = await Comment.findByPk(commentId, {raw: true});
+      const deletedRows = await Comment.destroy({
+        where: {
+          id: commentId,
+        }
+      });
+
+      if (!deletedRows) {
+        return null;
+      }
+
+      return commentForDelete;
+    } catch (error) {
+      this._logger.error(`Can not delete comment. Error: ${error}`);
+
+      return null;
+    }
+  }
+
+  async create(id, comment) {
+    const {Article, Comment} = this._models;
+
+    try {
+      const article = await Article.findByPk(id);
+      const newComment = await article.createComment({
+        text: comment.text,
+        [`user_id`]: 1,
+      });
+
+      return await Comment.findByPk(newComment.id, {raw: true});
+    } catch (error) {
+      this._logger.error(`Can not create comment for article with ${id}. Error: ${error}`);
+
+      return null;
+    }
   }
 }
 
