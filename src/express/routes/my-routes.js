@@ -6,14 +6,28 @@ const {DateTimeFormat} = require(`intl`);
 const {getSortedByDateComments} = require(`../../lib/utils`);
 const api = require(`../api`).getAPI();
 
+const ARTICLES_PER_PAGE = 8;
+
 const myRouter = new Router();
 
 let myArticles = null;
 
 myRouter.get(`/`, async (req, res) => {
-  myArticles = await api.getArticles();
+  let {page = 1} = req.query;
+  page = +page;
 
-  res.render(`my`, {myArticles, title: `Мои публикации`, DateTimeFormat});
+  const limit = ARTICLES_PER_PAGE;
+  const offset = (page - 1) * ARTICLES_PER_PAGE;
+  const {count, articles} = await api.getArticles({limit, offset});
+  const totalPages = Math.ceil(count / ARTICLES_PER_PAGE);
+
+  res.render(`my`, {
+    articles,
+    title: `Мои публикации`,
+    DateTimeFormat,
+    page,
+    totalPages,
+  });
 });
 
 myRouter.get(`/comments`, async (req, res) => {

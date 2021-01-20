@@ -33,6 +33,34 @@ class ArticleService {
     }
   }
 
+  async findPage({limit, offset}) {
+    const {Article} = this._db.models;
+
+    try {
+      const {count, rows} = await Article.findAndCountAll({
+        limit,
+        offset,
+        order: [
+          [`created_date`, `DESC`],
+        ]
+      });
+      const articles = [];
+
+      for (const article of rows) {
+        const categories = await article.getCategories({raw: true});
+        const comments = await article.getComments({raw: true});
+        article.dataValues.category = categories;
+        article.dataValues.comments = comments;
+        articles.push(article.dataValues);
+      }
+      return {count, articles};
+    } catch (error) {
+      this._logger.error(`Can not find articles. Error: ${error}`);
+
+      return null;
+    }
+  }
+
   async findOne(id) {
     const {Article} = this._db.models;
     const articleId = Number.parseInt(id, 10);

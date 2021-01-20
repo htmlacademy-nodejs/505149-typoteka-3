@@ -42,8 +42,9 @@ describe(`Article API end-points:`, () => {
 
   test(`output after GET should be an array with at least length 1`, async () => {
     res = await request(app).get(`/api/articles`);
-    expect(res.body.length).toBeGreaterThan(0);
-    expect(Array.isArray(res.body)).toBeTruthy();
+    expect(res.body.articles.length).toBeGreaterThan(0);
+    expect(res.body.count).toBeGreaterThan(0);
+    expect(Array.isArray(res.body.articles)).toBeTruthy();
   });
 
   test(`status code for wrong GET article request should be 404`, async () => {

@@ -8,6 +8,8 @@ const articleExist = require(`../middlewares/article-exist`);
 const commentValidator = require(`../middlewares/comment-validator`);
 const {getLogger} = require(`../../lib/logger`);
 
+const ARTICLES_PER_PAGE = 8;
+
 const route = new Router();
 const logger = getLogger({
   name: `api-server`,
@@ -17,10 +19,18 @@ module.exports = (app, articleService, commentService) => {
   app.use(`/articles`, route);
 
   route.get(`/`, async (req, res) => {
-    const articles = await articleService.findAll();
+    const {limit = ARTICLES_PER_PAGE, offset = 0} = req.query;
+
+    const result = await articleService.findPage({limit, offset});
+
+    if (!result) {
+      logger.error(`Error status - ${HttpCode.NOT_FOUND}`);
+      return res.status(HttpCode.NOT_FOUND)
+        .send(`Did not find articles`);
+    }
 
     return res.status(HttpCode.OK)
-        .json(articles);
+        .json(result);
   });
 
   route.get(`/:articleId`, async (req, res) => {
