@@ -18,9 +18,9 @@ class API {
     this._timeout = timeout;
   }
 
-  async getArticles() {
-    const {data: articles} = await axios.get(`${this._baseUrl}articles`);
-    return articles;
+  async getArticles({limit, offset}) {
+    const response = await axios.get(`${this._baseUrl}articles`, {params: {offset, limit}});
+    return response.data;
   }
 
   async getArticle(id) {
