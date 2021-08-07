@@ -46,6 +46,7 @@ module.exports = {
     }
     return someArray;
   },
+  ensureArray: (value) => Array.isArray(value) ? value : [value],
   readContent,
   makeMockData: async (files) => {
     let mockData = {};

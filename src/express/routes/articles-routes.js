@@ -2,11 +2,13 @@
 
 const {Router} = require(`express`);
 const {DateTimeFormat} = require(`intl`);
-const formidable = require(`formidable`);
+const multer = require(`multer`);
 const path = require(`path`);
+const {nanoid} = require(`nanoid`);
 
 const {getLogger} = require(`../../lib/logger`);
-const {dateToTime} = require(`../../lib/utils`);
+// const {dateToTime} = require(`../../lib/utils`);
+const {ensureArray} = require(`../../utils`);
 const api = require(`../api`).getAPI();
 
 const UPLOAD_DIR = `../upload/img/`;
@@ -16,72 +18,41 @@ const articlesRouter = new Router();
 const uploadDirAbsolute = path.resolve(__dirname, UPLOAD_DIR);
 
 const logger = getLogger({
-  name: `front-server-formidable`,
+  name: `articles-routes`,
 });
+
+const storage = multer.diskStorage({
+  destination: uploadDirAbsolute,
+  filename: (req, file, cb) => {
+    const uniqueName = nanoid(10);
+    const extension = file.originalname.split(`.`).pop();
+    cb(null, `${uniqueName}.${extension}`);
+  }
+});
+
+const upload = multer({storage});
 
 articlesRouter.get(`/add`, async (req, res) => {
   const categories = await api.getCategories();
   res.render(`new-post`, {DateTimeFormat, title: `Публикация`, categories});
 });
 
-articlesRouter.post(`/add`, async (req, res) => {
-  const categories = await api.getCategories();
-  const allowedTypes = [`image/jpeg`, `image/png`];
-  let isAllowedFormat;
-  let article = {category: []};
+articlesRouter.post(`/add`, upload.single(`file-picture`), async (req, res) => {
+  const {body, file} = req;
+  const articleData = {
+    picture: file.filename,
+    announce: body.announce,
+    fulltext: body.fulltext,
+    title: body[`title`],
+    category: ensureArray(body.category),
+  };
 
-  const formData = new formidable.IncomingForm({maxFileSize: 2 * 1024 * 1024});
   try {
-    formData.parse(req)
-      .on(`field`, (name, field) => {
-        if (name === `category`) {
-          article[name].push(field);
-        } else {
-          article[name] = field;
-        }
-      })
-      .on(`fileBegin`, (name, file) => {
-        if (!allowedTypes.includes(file.type)) {
-          isAllowedFormat = false;
-        } else {
-          isAllowedFormat = true;
-          file.path = uploadDirAbsolute + `/` + file.name;
-        }
-      })
-      .on(`file`, (name, file) => {
-        article.picture = file.path.match(/\/([^\/]+)\/?$/)[1];
-      })
-      .on(`aborted`, () => {
-        logger.error(`Request aborted by the user.`);
-      })
-      .on(`error`, async (err) => {
-        logger.error(`There is error while parsing form data. ${err}`);
-
-        article.picture = ``;
-        if (categories.length === 0) {
-          categories = await api.getCategories();
-        }
-
-        res.render(`new-post`, {article, DateTimeFormat, title: `Публикация`, categories});
-      })
-      .on(`end`, async () => {
-        if (!article[`created_date`]) {
-          article[`created_date`] = Date.now();
-        } else {
-          article[`created_date`] = new Date(dateToTime(`d.m.y`, article[`created_date`])).toISOString();
-        }
-        if (isAllowedFormat) {
-          const result = await api.createArticle(article);
-          if (result) {
-            return res.redirect(`/my`);
-          }
-          return formData.emit(`error`, `Did not create article.`);
-        } else {
-          return formData.emit(`error`, `Not correct file's extension.`);
-        }
-      });
-  } catch (error) {
-    logger.error(`Error happened: ${error}`);
+    await api.createArticle(articleData);
+    res.redirect(`/my`);
+  } catch (err) {
+    logger.error(err);
+    res.redirect(`back`);
   }
 });
 
