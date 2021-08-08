@@ -16,14 +16,16 @@ mainRouter.get(`/`, async (req, res) => {
   const limit = ARTICLES_PER_PAGE;
   const offset = (page - 1) * ARTICLES_PER_PAGE;
 
+  const allArticles = await api.getArticles({comments: true});
+
   const [{count, articles}, categories] = await Promise.all([
     api.getArticles({limit, offset, comments: true}),
     api.getCategories(true)
   ]);
 
   const totalPages = Math.ceil(count / ARTICLES_PER_PAGE);
-  const sortedByQtyOfComments = articles.slice().sort((a, b) => b.comments.length - a.comments.length).slice(0, 4);
-  const sortedByDateComments = (await getSortedByDateComments(articles)).slice(0, 4);
+  const sortedByQtyOfComments = allArticles.slice().sort((a, b) => b.comments.length - a.comments.length).slice(0, 4);
+  const sortedByDateComments = (await getSortedByDateComments(allArticles)).slice(0, 4);
 
   res.render(`main`, {
     articles,
