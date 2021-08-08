@@ -28,11 +28,10 @@ block content
               h2.post__title.title.title--main= article.title
               ul.post__themes.themes
                 each category in article.categories
-                  - var index = categories.findIndex((it) => it.title === category.title)
                   li.themes__item
-                    a.themes__item-link(href=`/articles/category/${index + 1}`)
+                    a.themes__item-link(href=`/articles/category/${category.id}`)
                       | #{category.title}
-                      sup  88
+                      sup  #{(categories.find((it) => it.id === category.id)).count}
                     button.themes__remove-btn(type='button') Удалить категорию
             .post__picture
               img(src=`/img/${article.picture}` alt='пейзаж море, скалы, пляж')

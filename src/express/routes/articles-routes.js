@@ -57,7 +57,7 @@ articlesRouter.post(`/add`, upload.single(`file-picture`), async (req, res) => {
 });
 
 articlesRouter.get(`/categories`, async (req, res) => {
-  const categories = await api.getCategories();
+  const categories = await api.getCategories(false);
 
   res.render(`all-categories`, {title: `Категории`, categories});
 });
@@ -78,11 +78,18 @@ articlesRouter.get(`/category/:id`, async (req, res) => {
 
 articlesRouter.get(`/:id`, async (req, res) => {
   const {id} = req.params;
-  const article = await api.getArticle(id);
-  const categories = await api.getCategories();
-  const sortedComments = article.comments.slice().sort((a, b) => (new Date(b[`created_date`])) - (new Date(a[`created_date`])));
 
-  res.render(`post`, {DateTimeFormat, article, title: `Пост`, categories, sortedComments});
+  try {
+    const [article, categories] = await Promise.all([
+      api.getArticle(id, true),
+      api.getCategories(true)
+    ]);
+
+    const sortedComments = article.comments.slice().sort((a, b) => (new Date(b[`created_date`])) - (new Date(a[`created_date`])));
+    res.render(`post`, {DateTimeFormat, categories, article, id, title: `Пост`, sortedComments});
+  } catch (err) {
+    res.status(err.response.status).render(`errors/404`, {title: `Страница не найдена`});
+  }
 });
 
 articlesRouter.get(`/edit/:id`, async (req, res) => {

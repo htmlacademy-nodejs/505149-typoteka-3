@@ -36,10 +36,11 @@ module.exports = (app, articleService, commentService) => {
 
   route.get(`/:articleId`, async (req, res) => {
     const {articleId} = req.params;
-    const article = await articleService.findOne(articleId);
+    const {comments} = req.query;
+    const article = await articleService.findOne(articleId, comments);
 
     if (!article) {
-      logger.error(`Did not find article with ${articleId}`);
+      logger.error(`Error status - ${HttpCode.NOT_FOUND}, url: /api/articles${req.url}`);
       return res.status(HttpCode.NOT_FOUND)
         .send(`Did not find article with ${articleId}`);
     }

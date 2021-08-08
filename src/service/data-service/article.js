@@ -98,23 +98,12 @@ class ArticleService {
   //   }
   // }
 
-  async findOne(id) {
-    const {Article} = this._db.models;
-    const articleId = Number.parseInt(id, 10);
-
-    try {
-      const article = await Article.findByPk(articleId);
-      const comments = await article.getComments({raw: true});
-      const categories = await article.getCategories({raw: true});
-      article.dataValues.categories = categories;
-      article.dataValues.comments = comments;
-
-      return article.dataValues;
-    } catch (error) {
-      this._logger.error(`Can not find article. Error: ${error}`);
-
-      return null;
+  async findOne(id, needComments) {
+    const include = [Aliase.CATEGORIES];
+    if (needComments) {
+      include.push(Aliase.COMMENTS);
     }
+    return await this._Article.findByPk(id, {include});
   }
 
   async findByCategory(id) {
