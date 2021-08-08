@@ -27,7 +27,7 @@ block content
                 +time(new Date(article[`created_date`]))
               h2.post__title.title.title--main= article.title
               ul.post__themes.themes
-                each category in article.category
+                each category in article.categories
                   - var index = categories.findIndex((it) => it.title === category.title)
                   li.themes__item
                     a.themes__item-link(href=`/articles/category/${index + 1}`)

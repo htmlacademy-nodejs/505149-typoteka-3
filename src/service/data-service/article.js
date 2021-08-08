@@ -20,7 +20,7 @@ class ArticleService {
       for (const article of articles) {
         const categories = await article.getCategories({raw: true});
         const comments = await article.getComments({raw: true});
-        article.dataValues.category = categories;
+        article.dataValues.categories = categories;
         article.dataValues.comments = comments;
         preparedArticles.push(article.dataValues);
       }
@@ -49,7 +49,7 @@ class ArticleService {
       for (const article of rows) {
         const categories = await article.getCategories({raw: true});
         const comments = await article.getComments({raw: true});
-        article.dataValues.category = categories;
+        article.dataValues.categories = categories;
         article.dataValues.comments = comments;
         articles.push(article.dataValues);
       }
@@ -69,7 +69,7 @@ class ArticleService {
       const article = await Article.findByPk(articleId);
       const comments = await article.getComments({raw: true});
       const categories = await article.getCategories({raw: true});
-      article.dataValues.category = categories;
+      article.dataValues.categories = categories;
       article.dataValues.comments = comments;
 
       return article.dataValues;
@@ -83,7 +83,7 @@ class ArticleService {
   async findByCategory(id) {
     const categoryId = Number.parseInt(id, 10);
     const articles = await this.findAll();
-    return articles.filter((article) => article.category.find((category) => category.id === categoryId));
+    return articles.filter((article) => article.categories.find((category) => category.id === categoryId));
   }
 
   async create(article) {
@@ -91,7 +91,7 @@ class ArticleService {
     const {Category, Article, User} = this._db.models;
     const allCategories = await Category.findAll({raw: true});
     const categoriesIds = allCategories.reduce((acc, item) => {
-      if (article.category.filter((cat) => cat === item.title).length) {
+      if (article.categories.filter((cat) => cat === item.title).length) {
         acc.push(item.id);
       }
       return acc;
@@ -123,7 +123,7 @@ class ArticleService {
     const {Article, Category} = this._db.models;
     const allCategories = await Category.findAll({raw: true});
     const categoriesIds = allCategories.reduce((acc, item) => {
-      if (article.category.filter((cat) => cat === item.title).length) {
+      if (article.categories.filter((cat) => cat === item.title).length) {
         acc.push(item.id);
       }
       return acc;

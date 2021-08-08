@@ -51,7 +51,7 @@ const generateArticles = (count, mockData) => (
     announce: shuffle(mockData.sentences).slice(0, getRandomInt(1, 3)).join(` `),
     fulltext: shuffle(mockData.sentences).slice(0, getRandomInt(1, mockData.sentences.length - 1)).join(` `),
     picture: `sea-fullsize@2x.jpg`,
-    category: shuffle(mockData.categories).slice(1, getRandomInt(1, mockData.categories.length - 1)),
+    categories: shuffle(mockData.categories).slice(1, getRandomInt(1, mockData.categories.length - 1)),
     comments: generateComments(getRandomInt(1, MAX_COMMENTS), mockData.comments),
     user: users[getRandomInt(0, users.length - 1)].email,
   }))

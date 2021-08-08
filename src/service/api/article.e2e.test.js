@@ -10,7 +10,7 @@ const mockArticle = {
   "title": `Title`,
   "announce": `Some text`,
   "fulltext": `Some very long text`,
-  "category": [
+  "categories": [
     `Программирование`,
   ],
   "picture": `forest@2x.jpg`,
@@ -83,7 +83,7 @@ describe(`Article API end-points:`, () => {
         "title": `New title`,
         "announce": `Some text`,
         "fulltext": `Some very long text`,
-        "category": [
+        "categories": [
           `Программирование`,
         ],
         "picture": `forest@2x.jpg`,

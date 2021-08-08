@@ -37,7 +37,7 @@ const generateArticles = (count, mockData) => {
     announce: shuffle(mockData.sentences).slice(0, getRandomInt(1, 3)).join(` `),
     fulltext: shuffle(mockData.sentences).slice(0, getRandomInt(1, mockData.sentences.length - 1)).join(` `),
     [`created_date`]: new Date(getRandomInt(DateRestrict.min, DateRestrict.max)).toISOString(),
-    category: shuffle(mockData.categories).slice(0, getRandomInt(1, mockData.categories.length - 3)),
+    categories: shuffle(mockData.categories).slice(0, getRandomInt(1, mockData.categories.length - 3)),
     comments: generateComments(getRandomInt(1, MAX_COMMENTS), mockData.comments),
     picture: `sea-fullsize@1x.jpg`,
   }));

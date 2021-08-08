@@ -44,7 +44,7 @@ articlesRouter.post(`/add`, upload.single(`file-picture`), async (req, res) => {
     announce: body.announce,
     fulltext: body.fulltext,
     title: body[`title`],
-    category: ensureArray(body.category),
+    categories: ensureArray(body.category),
   };
 
   try {

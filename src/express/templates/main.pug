@@ -55,7 +55,7 @@ block content
           each article in articles
             li.preview__item
               ul.preview__breadcrumbs
-                each category in article.category
+                each category in article.categories
                   - var index = categories.findIndex((it) => it.title === category.title)
                   li.preview__breadcrumbs-item
                     a.preview__breadcrumbs-link(href=`/articles/category/${index + 1}`)= category.title

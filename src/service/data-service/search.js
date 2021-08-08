@@ -14,7 +14,7 @@ class SearchService {
 
     for (const article of articles) {
       const categories = await article.getCategories({raw: true});
-      article.dataValues.category = categories;
+      article.dataValues.categories = categories;
       preparedArticles.push(article.dataValues);
     }
 
