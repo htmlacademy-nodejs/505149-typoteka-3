@@ -3,11 +3,11 @@
 const Sequelize = require(`sequelize`);
 
 const Aliase = require(`../models/aliases`);
-// const {getLogger} = require(`../../lib/logger`);
+const {getLogger} = require(`../../lib/logger`);
 
-// const logger = getLogger({
-//   name: `data-service-article`
-// });
+const logger = getLogger({
+  name: `data-service-article`
+});
 
 class ArticleService {
   constructor(sequelize) {
@@ -82,74 +82,34 @@ class ArticleService {
     return {count, articles};
   }
 
-  async create(article) {
-    const {sequelize} = this._db;
-    const {Category, Article, User} = this._db.models;
-    const allCategories = await Category.findAll({raw: true});
-    const categoriesIds = allCategories.reduce((acc, item) => {
-      if (article.categories.filter((cat) => cat === item.title).length) {
-        acc.push(item.id);
-      }
-      return acc;
-    }, []);
-
+  async create(articleData) {
     try {
-      const articleCategories = await Category.findAll({
-        where: {
-          id: {
-            [sequelize.Sequelize.Op.or]: categoriesIds,
-          },
-        }
-      });
-
-      const user = await User.findByPk(1);
-      const newArticle = await user.createArticle(article);
-      await newArticle.addCategories(articleCategories);
-
-      return await Article.findByPk(newArticle.id, {raw: true});
+      const article = await this._Article.create(articleData);
+      await article.addCategories(articleData.categories);
+      return article.get();
     } catch (error) {
-      this._logger.error(`Can not create article. Error: ${error}`);
-
-      return null;
+      return logger.error(error);
     }
   }
 
   async update(id, article) {
-    const {sequelize} = this._db;
-    const {Article, Category} = this._db.models;
-    const allCategories = await Category.findAll({raw: true});
-    const categoriesIds = allCategories.reduce((acc, item) => {
-      if (article.categories.filter((cat) => cat === item.title).length) {
-        acc.push(item.id);
-      }
-      return acc;
-    }, []);
-
     try {
-      const [rows] = await Article.update(article, {
-        where: {
-          id,
-        }
+      const [affectedRows] = await this._Article.update(article, {
+        where: {id},
       });
-
-      if (!rows) {
-        return null;
-      }
-
-      const updatedArticle = await Article.findByPk(id);
-      const articleCategories = await Category.findAll({
+      const articleCategories = await this._Category.findAll({
         where: {
           id: {
-            [sequelize.Sequelize.Op.or]: categoriesIds,
+            [Sequelize.Op.or]: article.categories,
           },
         }
       });
-      await updatedArticle.addCategories(articleCategories);
-      return await Article.findByPk(updatedArticle.id, {raw: true});
-    } catch (error) {
-      this._logger.error(`Can not update article. Error: ${error}`);
+      const updatedArticle = await this._Article.findByPk(id);
+      await updatedArticle.setCategories(articleCategories);
 
-      return null;
+      return !!affectedRows;
+    } catch (error) {
+      return logger.error(error);
     }
   }
 

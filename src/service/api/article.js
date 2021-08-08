@@ -79,18 +79,16 @@ module.exports = (app, articleService, commentService) => {
 
   route.put(`/:articleId`, articleValidator, async (req, res) => {
     const {articleId} = req.params;
-    const article = await articleService.findOne(articleId);
 
-    if (!article) {
-      logger.error(`Did not find article with ${articleId}`);
+    const isArticleUpdated = await articleService.update(articleId, req.body);
+
+    if (!isArticleUpdated) {
+      logger.error(`Error status - ${HttpCode.NOT_FOUND}, url: /api/articles${req.url}`);
       return res.status(HttpCode.NOT_FOUND)
         .send(`Did not find article with ${articleId}`);
     }
 
-    const updatedArticle = await articleService.update(articleId, req.body);
-
-    return res.status(HttpCode.OK)
-      .json(updatedArticle);
+    return res.status(HttpCode.OK).send(`Updated`);
   });
 
   route.delete(`/:articleId`, async (req, res) => {

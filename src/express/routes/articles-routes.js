@@ -77,7 +77,6 @@ articlesRouter.get(`/category/:id`, async (req, res) => {
   ]);
 
   const totalPages = Math.ceil(count / ARTICLES_PER_PAGE);
-  console.log(articles[0].categories);
 
   res.render(`articles-by-category`, {
     title: `Посты по категории`,
@@ -108,16 +107,42 @@ articlesRouter.get(`/:id`, async (req, res) => {
 
 articlesRouter.get(`/edit/:id`, async (req, res) => {
   const {id} = req.params;
-  const categories = await api.getCategories();
-  const article = await api.getArticle(id);
-  if (categories.length === 0) {
-    categories = await api.getCategories();
-  }
 
-  if (article) {
-    res.render(`new-post`, {article, DateTimeFormat, title: `Публикация`, categories});
-  } else {
-    res.status(404).render(`errors/404`, {title: `Страница не найдена`});
+  try {
+    const [article, categories] = await Promise.all([
+      api.getArticle(id),
+      api.getCategories(false)
+    ]);
+
+    res.render(`new-post`, {
+      article,
+      DateTimeFormat,
+      categories,
+      id,
+      title: `Публикация`
+    });
+  } catch (err) {
+    res.status(err.response.status).render(`errors/404`, {title: `Страница не найдена`});
+  }
+});
+
+articlesRouter.post(`/edit/:id`, upload.single(`file-picture`), async (req, res) => {
+  const {body, file} = req;
+  const {id} = req.params;
+  const articleData = {
+    picture: file ? file.filename : body[`old-image`],
+    announce: body.announce,
+    fulltext: body.fulltext,
+    title: body[`title`],
+    categories: ensureArray(body.category),
+  };
+
+  try {
+    await api.updateArticle(id, articleData);
+    res.redirect(`/my`);
+  } catch (err) {
+    logger.error(err);
+    res.redirect(`back`);
   }
 });
 

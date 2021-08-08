@@ -15,7 +15,7 @@ block content
       section
         .popup.popup--new-publication.popup--anti
           .new-publication
-            form(action='/articles/add' method='post' enctype='multipart/form-data')
+            form(action=(article ? `/articles/edit/${id}` : '/articles/add') method='post' enctype='multipart/form-data')
               .new-publication__header
                 h1= (article ? `Редактировать публикацию` : `Новая публикация`)
                 .new-publication__date-form
@@ -33,7 +33,8 @@ block content
                       input(type='text' name='title' placeholder='Заголовок' value=(article && article.title ? article.title : '') required)
                   .form__field.form__field--post-image
                     label
-                      input#image-name-field(type='text' name='picture' value=(article && article.picture ? article.picture : '') placeholder='Фотография' readonly)
+                      input(type="hidden" name="old-image" value=(article && article.picture ? article.picture : ''))
+                      input#image-name-field(type='text' name='picture' value= placeholder='Фотография' readonly)
                     .form__image-loader.form__image-loader--publication
                       input#file-picture.visually-hidden(type='file' name='file-picture')
                       label(for='file-picture')
@@ -41,9 +42,9 @@ block content
                     button.button.button--transparent Удалить
                   .new-publication__category-wrapper
                     .new-publication__checkbox.new-publication__checkbox--auto
-                      each category, index in categories
-                        input(id=('category-checkbox-' + index) type='checkbox' name=('category') value=category.title checked=(article && article.category ? article.category.includes(category.title) : false))
-                        label(for=('category-checkbox-' + index)) #{category.title}
+                      each category in categories
+                        input(id=('category-checkbox-' + category.id) type='checkbox' name=('category') value=category.id checked=(article && article.categories ? article.categories.find((it) => it.id === category.id) : false))
+                        label(for=('category-checkbox-' + category.id)) #{category.title}
                     a.new-publication__form-link.button.button--transparent(href='#') Добавить категорию
                 .form__wrapper.form__wrapper--text
                   .form__field.form__field--publication-text
