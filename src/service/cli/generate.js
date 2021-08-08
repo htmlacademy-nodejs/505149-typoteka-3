@@ -6,13 +6,18 @@ const {nanoid} = require(`nanoid`);
 const {getLogger} = require(`../../lib/logger`);
 const {getRandomInt, shuffle, DateRestrict, makeMockData} = require(`../../utils`);
 
-const {MAX_ID_LENGTH, TXT_FILES_DIR} = require(`../../../src/constants`);
-const DEFAULT_COUNT = 1;
-const MAX_COMMENTS = 4;
-const FILE_NAME = `mocks.json`;
+const {
+  MAX_ID_LENGTH,
+  TXT_FILES_DIR,
+  MAX_DATA_COUNT,
+  DEFAULT_COUNT,
+  MAX_COMMENTS,
+  FILE_NAME,
+  ExitCode
+} = require(`../../../src/constants`);
 
 const logger = getLogger({
-  name: `api-server`,
+  name: `api-generate`,
 });
 
 const generateComments = (count, comments) => (
@@ -49,12 +54,16 @@ const generateArticles = (count, mockData) => {
 module.exports = {
   name: `--generate`,
   async run(args) {
+    const [count] = args;
+    if (count >= MAX_DATA_COUNT) {
+      logger.error(`Не больше 1000 постов`);
+      process.exit(ExitCode.error);
+    }
     const files = await fs.readdir(TXT_FILES_DIR);
     const mockData = await makeMockData(files);
 
-    const [count] = args;
-    const countArticle = Number.parseInt(count, 10) || DEFAULT_COUNT;
-    const content = JSON.stringify(generateArticles(countArticle, mockData), null, 2);
+    const countArticles = Number.parseInt(count, 10) || DEFAULT_COUNT;
+    const content = JSON.stringify(generateArticles(countArticles, mockData), null, 2);
 
     try {
       await fs.writeFile(FILE_NAME, content);
