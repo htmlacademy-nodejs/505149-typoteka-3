@@ -9,6 +9,7 @@ module.exports.MAX_COMMENTS = 4;
 module.exports.FILE_NAME = `mocks.json`;
 module.exports.PUBLIC_DIR = `files`;
 module.exports.UPLOAD_DIR = `upload`;
+module.exports.TIMEOUT = 1000;
 module.exports.TXT_FILES_DIR = `./data/`;
 
 module.exports.ExitCode = {
