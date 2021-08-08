@@ -9,9 +9,7 @@ const searchRoutes = require(`./routes/search-routes`);
 const mainRoutes = require(`./routes/main-routes`);
 const {getLogger} = require(`../lib/logger`);
 const {APP_PORT} = require(`../../config`);
-
-const PUBLIC_DIR = `files`;
-const UPLOAD_DIR = `upload`;
+const {PUBLIC_DIR, UPLOAD_DIR} = require(`../constants`);
 
 const logger = getLogger({
   name: `front-server`,
@@ -24,6 +22,14 @@ app.use(express.static(path.join(__dirname, UPLOAD_DIR)));
 
 app.set(`views`, path.join(__dirname, `templates`));
 app.set(`view engine`, `pug`);
+
+app.use((req, res, next) => {
+  logger.debug(`Request on route ${req.url}`);
+  res.on(`finish`, () => {
+    logger.info(`Response status code ${res.statusCode}`);
+  });
+  next();
+});
 
 app.use(`/`, mainRoutes);
 app.use(`/my`, myRoutes);
