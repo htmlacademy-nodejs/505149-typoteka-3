@@ -10,6 +10,7 @@ const {getLogger} = require(`../../lib/logger`);
 // const {dateToTime} = require(`../../lib/utils`);
 const {ensureArray} = require(`../../utils`);
 const api = require(`../api`).getAPI();
+const {ARTICLES_PER_PAGE} = require(`../../constants`);
 
 const UPLOAD_DIR = `../upload/img/`;
 
@@ -64,16 +65,29 @@ articlesRouter.get(`/categories`, async (req, res) => {
 
 articlesRouter.get(`/category/:id`, async (req, res) => {
   const {id} = req.params;
-  const categoryId = Number.parseInt(id, 10);
-  const categories = await api.getCategories();
-  const selectedCategory = categories.find((it) => it.id === categoryId);
-  const articlesByCategory = await api.getArticlesByCategory(categoryId);
+  let {page = 1} = req.query;
+  page = +page;
 
-  if (articlesByCategory.length) {
-    res.render(`articles-by-category`, {title: `Статьи по категории`, categories, selectedCategory, articlesByCategory, id, DateTimeFormat});
-  } else {
-    res.status(404).render(`errors/404`, {title: `Страница не найдена`, msg: `Нет статей такой категории`});
-  }
+  const limit = ARTICLES_PER_PAGE;
+  const offset = (page - 1) * ARTICLES_PER_PAGE;
+
+  const [{count, articles}, categories] = await Promise.all([
+    api.getArticlesByCategory({limit, offset, id}),
+    api.getCategories(true)
+  ]);
+
+  const totalPages = Math.ceil(count / ARTICLES_PER_PAGE);
+  console.log(articles[0].categories);
+
+  res.render(`articles-by-category`, {
+    title: `Посты по категории`,
+    categories,
+    articles,
+    id,
+    DateTimeFormat,
+    page,
+    totalPages
+  });
 });
 
 articlesRouter.get(`/:id`, async (req, res) => {

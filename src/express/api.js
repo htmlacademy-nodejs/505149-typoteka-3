@@ -43,10 +43,9 @@ class API {
     return this._load(`/categories`, {params: {needCount}});
   }
 
-  // async getArticlesByCategory(id) {
-  //   const {data: articles} = await axios.get(`${this._baseUrl}categories/${id}`);
-  //   return articles;
-  // }
+  async getArticlesByCategory({id, offset, limit}) {
+    return this._load(`/articles/category/${id}`, {params: {offset, limit}});
+  }
 
   async createArticle(data) {
     return this._load(`/articles`, {

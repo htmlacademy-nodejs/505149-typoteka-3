@@ -1,5 +1,7 @@
 'use strict';
 
+const Sequelize = require(`sequelize`);
+
 const Aliase = require(`../models/aliases`);
 // const {getLogger} = require(`../../lib/logger`);
 
@@ -25,33 +27,6 @@ class ArticleService {
     return articles.map((item) => item.get());
   }
 
-  // async findAll() {
-  //   const {Article} = this._db.models;
-
-  //   try {
-  //     const articles = await Article.findAll({
-  //       order: [
-  //         [`created_date`, `DESC`],
-  //       ]
-  //     });
-  //     const preparedArticles = [];
-
-  //     for (const article of articles) {
-  //       const categories = await article.getCategories({raw: true});
-  //       const comments = await article.getComments({raw: true});
-  //       article.dataValues.categories = categories;
-  //       article.dataValues.comments = comments;
-  //       preparedArticles.push(article.dataValues);
-  //     }
-
-  //     return preparedArticles;
-  //   } catch (error) {
-  //     this._logger.error(`Can not find articles. Error: ${error}`);
-
-  //     return [];
-  //   }
-  // }
-
   async findPage({limit, offset, comments}) {
     const include = [Aliase.CATEGORIES];
     const order = [[`created_date`, `DESC`]];
@@ -70,34 +45,6 @@ class ArticleService {
     return {count, articles: rows};
   }
 
-  // async findPage({limit, offset}) {
-  //   const {Article} = this._db.models;
-
-  //   try {
-  //     const {count, rows} = await Article.findAndCountAll({
-  //       limit,
-  //       offset,
-  //       order: [
-  //         [`created_date`, `DESC`],
-  //       ]
-  //     });
-  //     const articles = [];
-
-  //     for (const article of rows) {
-  //       const categories = await article.getCategories({raw: true});
-  //       const comments = await article.getComments({raw: true});
-  //       article.dataValues.categories = categories;
-  //       article.dataValues.comments = comments;
-  //       articles.push(article.dataValues);
-  //     }
-  //     return {count, articles};
-  //   } catch (error) {
-  //     this._logger.error(`Can not find articles. Error: ${error}`);
-
-  //     return null;
-  //   }
-  // }
-
   async findOne(id, needComments) {
     const include = [Aliase.CATEGORIES];
     if (needComments) {
@@ -106,10 +53,33 @@ class ArticleService {
     return await this._Article.findByPk(id, {include});
   }
 
-  async findByCategory(id) {
-    const categoryId = Number.parseInt(id, 10);
-    const articles = await this.findAll();
-    return articles.filter((article) => article.categories.find((category) => category.id === categoryId));
+  async findByCategory({limit, offset, categoryId}) {
+    const include = [Aliase.CATEGORIES, Aliase.COMMENTS];
+    const {count, rows} = await this._Article.findAndCountAll({
+      attributes: [`id`],
+      include: [{
+        model: this._Category,
+        as: Aliase.CATEGORIES,
+        attributes: [],
+        where: {
+          id: categoryId
+        },
+      }],
+      limit,
+      offset,
+      raw: true
+    });
+
+    const articles = await this._Article.findAll({
+      include,
+      where: {
+        id: {
+          [Sequelize.Op.in]: rows.map((it) => it.id)
+        }
+      },
+    });
+
+    return {count, articles};
   }
 
   async create(article) {

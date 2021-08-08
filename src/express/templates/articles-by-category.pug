@@ -9,25 +9,24 @@ block content
       a.header__enter(href='/login') Вход с паролем
       a.header__search.button.button--search(href='/search' aria-label='поиск по сайту')
     main.articles-category
-      h1= selectedCategory.title
+      h1= categories.find((it) => it.id === +id).title
       section.articles-category__theme-list
         h2.visually-hidden Список тем
         ul.themes
-          each category, index in categories
+          each category in categories
             li.themes__item
-              a(class=`${selectedCategory.title === category.title ? `themes__item-link themes__item-link--active` : `themes__item-link`}` href=`/articles/category/${index + 1}`)
+              a(class=`${categories.find((it) => it.id === +id).title === category.title ? `themes__item-link themes__item-link--active` : `themes__item-link`}` href=`/articles/category/${category.id}`)
                 | #{category.title}
-                sup  88
+                sup  #{category.count}
       section.articles-category__list.preview
         h2.visually-hidden Список превью статей
-        ul(class=`${articlesByCategory.length === 1 ? `preview__list-one` : `preview__list`}`)
-          each article in articlesByCategory
+        ul(class=`${articles.length === 1 ? `preview__list-one` : `preview__list`}`)
+          each article in articles
             li.preview__item
               ul.preview__breadcrumbs
-                each category in article.category
-                  - var index = categories.findIndex((it) => it.title === category.title)
+                each category in article.categories
                   li.preview__breadcrumbs-item
-                    a.preview__breadcrumbs-link(href=`/articles/category/${index + 1}`)= category.title
+                    a.preview__breadcrumbs-link(href=`/articles/category/${category.id}`)= category.title
               .preview__background
                 img.preview__background-image(src=`/img/${article.picture}` width='460' height='240' alt=`${article.announce}`)
               time.preview__time(datetime=article[`created_date`])
@@ -40,4 +39,5 @@ block content
                 span.preview__cloud
                 |
                 b.preview__comment-count= article.comments.length
+    +pagination(page, totalPages, 2, `?`)
     include partials/footer.pug

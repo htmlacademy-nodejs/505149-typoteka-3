@@ -49,6 +49,22 @@ module.exports = (app, articleService, commentService) => {
         .json(article);
   });
 
+  route.get(`/category/:categoryId`, async (req, res) => {
+    const {categoryId} = req.params;
+    const {limit, offset} = req.query;
+
+    const result = await articleService.findByCategory({limit, offset, categoryId});
+
+    if (!result) {
+      logger.error(`Did not find articles with category ${categoryId}`);
+      return res.status(HttpCode.NOT_FOUND)
+        .send(`Did not find articles with category ${categoryId}`);
+    }
+
+    return res.status(HttpCode.OK)
+      .json(result);
+  });
+
   route.post(`/`, articleValidator, async (req, res) => {
     const article = await articleService.create(req.body);
 
