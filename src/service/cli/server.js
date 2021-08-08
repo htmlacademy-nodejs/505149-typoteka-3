@@ -6,7 +6,7 @@ const {HttpCode} = require(`../../constants`);
 const createApi = require(`../api`);
 const {getLogger} = require(`../../lib/logger`);
 const {API_PORT} = require(`../../../config`);
-const dataBase = require(`../database`);
+const dataBase = require(`../database/sequelize`);
 const {ExitCode} = require(`../../constants`);
 
 const logger = getLogger({
