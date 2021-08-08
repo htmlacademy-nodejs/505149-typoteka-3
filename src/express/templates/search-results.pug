@@ -20,10 +20,11 @@ block content
               label
                 input(type='search' name='query' placeholder='Что ищем?' value= query)
               button.search__button.button.button--transparent(type='submit') Найти
-            each article in articles
+            each article in foundArticles
               .search__result
                 time.search__date(datetime=article[`created_date`])
                   +time(new Date(article[`created_date`]))
                 a.search__link(href=`/articles/${article.id}`)
                   |  #{article.title}
+    +pagination(page, totalPages, 2, `?`)
     include partials/footer.pug

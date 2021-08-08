@@ -1,24 +1,34 @@
 'use strict';
 
+const {Op} = require(`sequelize`);
+
+const Aliase = require(`../models/aliases`);
+
 class SearchService {
-  constructor(db, logger) {
-    this._models = db.models;
-    this._logger = logger;
+  constructor(sequelize) {
+    this._Article = sequelize.models.article;
   }
 
-  async findAll(searchText) {
-    const {Article} = this._models;
+  async findAll({offset, limit, query}) {
+    const include = [Aliase.CATEGORIES];
+    const order = [[`created_date`, `DESC`]];
+    const where = {
+      title: {
+        [Op.substring]: query
+        // как сделать независимость от регистра?
+      }
+    };
 
-    const articles = await Article.findAll();
-    const preparedArticles = [];
+    const {count, rows} = await this._Article.findAndCountAll({
+      where,
+      limit,
+      offset,
+      include,
+      order,
+      distinct: true
+    });
 
-    for (const article of articles) {
-      const categories = await article.getCategories({raw: true});
-      article.dataValues.categories = categories;
-      preparedArticles.push(article.dataValues);
-    }
-
-    return preparedArticles.filter((article) => article.title.toLowerCase().includes(searchText));
+    return {count, foundArticles: rows};
   }
 }
 
