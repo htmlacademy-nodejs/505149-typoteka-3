@@ -11,6 +11,7 @@ module.exports.PUBLIC_DIR = `files`;
 module.exports.UPLOAD_DIR = `upload`;
 module.exports.TIMEOUT = 1000;
 module.exports.TXT_FILES_DIR = `./data/`;
+module.exports.ARTICLES_PER_PAGE = 8;
 
 module.exports.ExitCode = {
   error: 1,

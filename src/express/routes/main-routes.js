@@ -5,8 +5,7 @@ const {DateTimeFormat} = require(`intl`);
 
 const {getSortedByDateComments} = require(`../../lib/utils`);
 const api = require(`../api`).getAPI();
-
-const ARTICLES_PER_PAGE = 8;
+const {ARTICLES_PER_PAGE} = require(`../../constants`);
 
 const mainRouter = new Router();
 
@@ -16,13 +15,15 @@ mainRouter.get(`/`, async (req, res) => {
 
   const limit = ARTICLES_PER_PAGE;
   const offset = (page - 1) * ARTICLES_PER_PAGE;
-  const {count, articles} = await api.getArticles({limit, offset});
+
+  const [{count, articles}, categories] = await Promise.all([
+    api.getArticles({limit, offset, comments: true}),
+    api.getCategories(true)
+  ]);
 
   const totalPages = Math.ceil(count / ARTICLES_PER_PAGE);
-  const categories = await api.getCategories();
-  const articlesId = articles.map((it) => it.id);
-  const sortedByQtyOfComments = articles.slice().sort((a, b) => b.comments.length - a.comments.length);
-  const sortedByDateComments = (await getSortedByDateComments(articlesId)).slice(0, 4);
+  const sortedByQtyOfComments = articles.slice().sort((a, b) => b.comments.length - a.comments.length).slice(0, 4);
+  const sortedByDateComments = (await getSortedByDateComments(articles)).slice(0, 4);
 
   res.render(`main`, {
     articles,

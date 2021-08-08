@@ -20,7 +20,7 @@ defineModels(sequelize);
 const createApi = async () => {
   const agregatingRouter = new Router();
 
-  category(agregatingRouter, new CategoryService(sequelize), new ArticleService(sequelize));
+  category(agregatingRouter, new CategoryService(sequelize));
   article(agregatingRouter, new ArticleService(sequelize), new CommentService(sequelize));
   search(agregatingRouter, new SearchService(sequelize));
 
