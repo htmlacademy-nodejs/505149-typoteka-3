@@ -25,42 +25,29 @@ class CommentService {
     }
   }
 
-  async delete(commentId) {
-    const {Comment} = this._models;
-
+  async drop(commentId) {
     try {
-      const commentForDelete = await Comment.findByPk(commentId, {raw: true});
-      const deletedRows = await Comment.destroy({
-        where: {
-          id: commentId,
-        }
+      const deletedRow = await this._Comment.destroy({
+        where: {id: commentId}
       });
-
-      if (!deletedRows) {
-        return null;
-      }
-
-      return commentForDelete;
+      return !!deletedRow;
     } catch (error) {
-      this._logger.error(`Can not delete comment. Error: ${error}`);
+      logger.error(`Can not delete comment. Error: ${error}`);
 
       return null;
     }
   }
 
-  async create(id, comment) {
-    const {Article, Comment} = this._models;
-
+  async create(articleId, comment) {
     try {
-      const article = await Article.findByPk(id);
-      const newComment = await article.createComment({
-        text: comment.text,
-        [`user_id`]: 1,
+      const newComment = await this._Comment.create({
+        articleId,
+        ...comment
       });
 
-      return await Comment.findByPk(newComment.id, {raw: true});
+      return newComment;
     } catch (error) {
-      this._logger.error(`Can not create comment for article with ${id}. Error: ${error}`);
+      logger.error(`Can not create comment for article with ${articleId}. Error: ${error}`);
 
       return null;
     }
