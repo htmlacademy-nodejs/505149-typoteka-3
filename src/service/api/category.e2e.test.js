@@ -3,7 +3,7 @@
 const request = require(`supertest`);
 
 const {createApp} = require(`../cli/server`);
-const {sequelize} = require(`../database`);
+const sequelize = require(`../database/sequelize`);
 const {HttpCode, ExitCode} = require(`../../constants`);
 
 describe(`Categories API end-points:`, () => {
@@ -30,6 +30,8 @@ describe(`Categories API end-points:`, () => {
   test(`output should have at least one category`, async () => {
     expect(res.body.length).toBeGreaterThan(0);
   });
+
+  test(`returns list of 9 categories`, () => expect(res.body.length).toBe(9));
 
   test(`each item's title of output have to be string`, () => {
     expect(Array.isArray(res.body)).toBeTruthy();

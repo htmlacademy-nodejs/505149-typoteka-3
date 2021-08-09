@@ -3,11 +3,11 @@
 const request = require(`supertest`);
 
 const {createApp} = require(`../cli/server`);
-const {sequelize} = require(`../database`);
+const sequelize = require(`../database/sequelize`);
 const {HttpCode, ExitCode} = require(`../../constants`);
 
 describe(`Search API end-points:`, () => {
-  const query = `как`;
+  const query = `Как`;
   let app = null;
   let res;
 
@@ -28,28 +28,28 @@ describe(`Search API end-points:`, () => {
     expect(res.statusCode).toBe(HttpCode.OK);
   });
 
-  test(`output have to be array`, async () => {
+  test(`output have to contain array with search results`, async () => {
     res = await request(app).get(encodeURI(`/api/search?query=${query}`));
-    expect(Array.isArray(res.body)).toBeTruthy();
+    expect(Array.isArray(res.body.foundArticles)).toBeTruthy();
   });
 
-  test(`each item of output should have title property`, async () => {
+  test(`output have to contain count of articles that were found`, async () => {
     res = await request(app).get(encodeURI(`/api/search?query=${query}`));
-    const response = res.body;
+
+    expect(res.body.count).toBeGreaterThan(0);
+  });
+
+  test(`each item item of search results should have title property`, async () => {
+    res = await request(app).get(encodeURI(`/api/search?query=${query}`));
+    const response = res.body.foundArticles;
     for (const item of response) {
       expect(item).toHaveProperty(`title`);
     }
   });
 
-  test(`Should return 400 status for empty request`, async () => {
-    res = await request(app).get(encodeURI(`/api/search?query=`));
+  test(`should return empty array as search result after wrong request`, async () => {
+    res = await request(app).get(encodeURI(`/api/search?query=iuwhbe`));
 
-    expect(res.statusCode).toBe(HttpCode.BAD_REQUEST);
-  });
-
-  test(`Should return 404 status for wrong request`, async () => {
-    res = await request(app).get(encodeURI(`/api/search?query=${null}`));
-
-    expect(res.statusCode).toBe(HttpCode.NOT_FOUND);
+    expect(res.body.foundArticles).toStrictEqual([]);
   });
 });

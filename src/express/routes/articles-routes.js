@@ -7,7 +7,6 @@ const path = require(`path`);
 const {nanoid} = require(`nanoid`);
 
 const {getLogger} = require(`../../lib/logger`);
-// const {dateToTime} = require(`../../lib/utils`);
 const {ensureArray} = require(`../../utils`);
 const api = require(`../api`).getAPI();
 const {ARTICLES_PER_PAGE} = require(`../../constants`);
