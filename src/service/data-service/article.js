@@ -113,28 +113,11 @@ class ArticleService {
     }
   }
 
-  async delete(id) {
-    const {Article} = this._db.models;
-
-    try {
-      const articleForDelete = await Article.findByPk(id, {raw: true});
-      const deletedRows = await Article.destroy({
-        returning: true,
-        where: {
-          id,
-        }
-      });
-
-      if (!deletedRows) {
-        return null;
-      }
-
-      return articleForDelete;
-    } catch (error) {
-      this._logger.error(`Can not delete article. Error: ${error}`);
-
-      return null;
-    }
+  async drop(id) {
+    const deletedRow = await this._Article.destroy({
+      where: {id}
+    });
+    return !!deletedRow;
   }
 }
 

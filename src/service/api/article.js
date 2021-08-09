@@ -93,16 +93,14 @@ module.exports = (app, articleService, commentService) => {
 
   route.delete(`/:articleId`, async (req, res) => {
     const {articleId} = req.params;
-    const article = await articleService.delete(articleId);
+    const isArticleDeleted = await articleService.drop(articleId);
 
-    if (!article) {
-      logger.error(`Did not find article with ${articleId}`);
-      return res.status(HttpCode.NOT_FOUND)
-        .send(`Did not find article with ${articleId}`);
+    if (!isArticleDeleted) {
+      logger.error(`Error status - ${HttpCode.INTERNAL_SERVER_ERROR}`);
+      return res.status(HttpCode.INTERNAL_SERVER_ERROR).send(`Can not delete article`);
     }
 
-    return res.status(HttpCode.OK)
-      .json(article);
+    return res.status(HttpCode.OK).send(`Deleted!`);
   });
 
   route.get(`/:articleId/comments`, articleExist(articleService), async (req, res) => {

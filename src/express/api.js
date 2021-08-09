@@ -60,11 +60,6 @@ class API {
       data
     });
   }
-
-  // async getComments(id) {
-  //   const {data: comments} = await axios.get(`${this._baseUrl}articles/${id}/comments`);
-  //   return comments;
-  // }
 }
 
 const defaultAPI = new API(defaultUrl, TIMEOUT);
