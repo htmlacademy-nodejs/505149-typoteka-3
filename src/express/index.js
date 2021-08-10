@@ -2,6 +2,7 @@
 
 const express = require(`express`);
 const path = require(`path`);
+const helmet = require(`helmet`);
 
 const myRoutes = require(`./routes/my-routes`);
 const articlesRoutes = require(`./routes/articles-routes`);
@@ -19,6 +20,16 @@ const app = express();
 app.use(express.urlencoded({extended: false}));
 app.use(express.static(path.join(__dirname, PUBLIC_DIR)));
 app.use(express.static(path.join(__dirname, UPLOAD_DIR)));
+
+app.use(helmet({
+  contentSecurityPolicy: {
+    useDefaults: true,
+    directives: {
+      scriptSrc: [`'self'`]
+    }
+  },
+  xssFilter: true,
+}));
 
 app.set(`views`, path.join(__dirname, `templates`));
 app.set(`view engine`, `pug`);
