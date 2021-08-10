@@ -29,6 +29,7 @@ block content
               .new-publication__form.form
                 .form__wrapper.form__wrapper--intro
                   .form__field
+                    +errorMessage(error)
                     label
                       input(type='text' name='title' placeholder='Заголовок' value=(article && article.title ? article.title : '') required)
                   .form__field.form__field--post-image

@@ -33,8 +33,9 @@ const storage = multer.diskStorage({
 const upload = multer({storage});
 
 articlesRouter.get(`/add`, async (req, res) => {
+  const {error} = req.query;
   const categories = await api.getCategories();
-  res.render(`new-post`, {DateTimeFormat, title: `Публикация`, categories});
+  res.render(`new-post`, {DateTimeFormat, title: `Публикация`, categories, error});
 });
 
 articlesRouter.post(`/add`, upload.single(`file-picture`), async (req, res) => {
@@ -45,6 +46,8 @@ articlesRouter.post(`/add`, upload.single(`file-picture`), async (req, res) => {
     fulltext: body.fulltext,
     title: body[`title`],
     categories: ensureArray(body.category),
+    // временно
+    userId: 2
   };
 
   try {
@@ -52,7 +55,7 @@ articlesRouter.post(`/add`, upload.single(`file-picture`), async (req, res) => {
     res.redirect(`/my`);
   } catch (err) {
     logger.error(err);
-    res.redirect(`back`);
+    res.redirect(`/articles/add?error=${encodeURIComponent(err.response.data)}`);
   }
 });
 
