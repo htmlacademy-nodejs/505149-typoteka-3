@@ -109,6 +109,7 @@ articlesRouter.get(`/:id`, async (req, res) => {
 
 articlesRouter.get(`/edit/:id`, async (req, res) => {
   const {id} = req.params;
+  const {error} = req.query;
 
   try {
     const [article, categories] = await Promise.all([
@@ -121,7 +122,8 @@ articlesRouter.get(`/edit/:id`, async (req, res) => {
       DateTimeFormat,
       categories,
       id,
-      title: `Публикация`
+      title: `Публикация`,
+      error
     });
   } catch (err) {
     res.status(err.response.status).render(`errors/404`, {title: `Страница не найдена`});
@@ -137,6 +139,8 @@ articlesRouter.post(`/edit/:id`, upload.single(`file-picture`), async (req, res)
     fulltext: body.fulltext,
     title: body[`title`],
     categories: ensureArray(body.category),
+    // временно
+    userId: 1
   };
 
   try {
@@ -144,7 +148,7 @@ articlesRouter.post(`/edit/:id`, upload.single(`file-picture`), async (req, res)
     res.redirect(`/my`);
   } catch (err) {
     logger.error(err);
-    res.redirect(`back`);
+    res.redirect(`/articles/add?error=${encodeURIComponent(err.response.data)}`);
   }
 });
 
