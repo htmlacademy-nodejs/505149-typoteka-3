@@ -7,9 +7,9 @@ const sequelize = require(`../database/sequelize`);
 const {HttpCode, ExitCode} = require(`../../constants`);
 
 const mockArticle = {
-  "title": `Title`,
-  "announce": `Some text`,
-  "fulltext": `Some very long text`,
+  "title": `Title should be enough long`,
+  "announce": `Some text should be really really really really really really enough long`,
+  "fulltext": `Some very long text! Some very long text! Some very long text! Some very long text! Some very long text!`,
   "categories": [2, 7],
   "picture": `forest@2x.jpg`,
   "userId": 1
@@ -73,6 +73,34 @@ describe(`Article API end-points:`, () => {
     expect(res.statusCode).toBe(HttpCode.CREATED);
   });
 
+  test(`status code for incorrect POST article query should be 400`, async () => {
+    const badArticles = [
+      {...mockArticle, announce: true},
+      {...mockArticle, picture: 12345},
+      {...mockArticle, categories: `Котики`}
+    ];
+
+    for (const badArticle of badArticles) {
+      res = await request(app).post(`/api/articles`).send(badArticle);
+
+      expect(res.statusCode).toBe(HttpCode.BAD_REQUEST);
+    }
+  });
+
+  test(`when field value is wrong response code is 400`, async () => {
+    const badArticles = [
+      {...mockArticle, fulltext: -1},
+      {...mockArticle, title: `too short`},
+      {...mockArticle, categories: []}
+    ];
+
+    for (const badArticle of badArticles) {
+      res = await request(app).post(`/api/articles`).send(badArticle);
+
+      expect(res.statusCode).toBe(HttpCode.BAD_REQUEST);
+    }
+  });
+
   test(`status code for GET article query by id should be 200`, async () => {
     res = await request(app).get(`/api/articles/${newId}`);
 
@@ -97,9 +125,9 @@ describe(`Article API end-points:`, () => {
     res = await request(app)
       .put(`/api/articles/${newId}`)
       .send({
-        "title": `New title`,
-        "announce": `Some text`,
-        "fulltext": `Some very long new text`,
+        "title": `New title also should be enough long`,
+        "announce": `Updated! Some text should be really really really really really really enough long`,
+        "fulltext": `Some very long text! Some very long text! Some very long text! Some very long text! Some very long text!`,
         "categories": [2, 5],
         "picture": `forest@2x.jpg`,
         "userId": 1
@@ -111,8 +139,8 @@ describe(`Article API end-points:`, () => {
     res = await request(app)
       .get(`/api/articles/${newId}`);
 
-    expect(res.body.title).toBe(`New title`);
-    expect(res.body.fulltext).toBe(`Some very long new text`);
+    expect(res.body.title).toBe(`New title also should be enough long`);
+    expect(res.body.fulltext).toBe(`Some very long text! Some very long text! Some very long text! Some very long text! Some very long text!`);
     expect(res.body.categories[1].id).toBe(5);
   });
 
@@ -163,7 +191,7 @@ describe(`Article comments API end-points`, () => {
     expect(res.statusCode).toBe(HttpCode.OK);
   });
 
-  test(`status code after request of comments with wrong offer id should be 404`, async () => {
+  test(`status code after request of comments with wrong article id should be 404`, async () => {
     res = await request(app).get((`/api/articles/1000/comments`));
 
     expect(res.statusCode).toBe(HttpCode.NOT_FOUND);
@@ -178,6 +206,34 @@ describe(`Article comments API end-points`, () => {
       });
 
     expect(res.statusCode).toBe(HttpCode.CREATED);
+  });
+
+  test(`status code for incorrect POST comment request should be 400`, async () => {
+    const badComments = [
+      {
+        "text": `Это новый очень хороший комментарий!`,
+        "userId": `Странный id`
+      },
+      {
+        "text": 12345,
+        "userId": 1
+      }
+    ];
+
+    for (const badComment of badComments) {
+      res = await request(app).post(`/api/articles/${newId}/comments`).send(badComment);
+
+      expect(res.statusCode).toBe(HttpCode.BAD_REQUEST);
+    }
+  });
+
+  test(`when field value is wrong response code is 400`, async () => {
+    res = await request(app).post(`/api/articles/${newId}/comments`).send({
+      "text": `Очень короткий`,
+      "userId": 1
+    });
+
+    expect(res.statusCode).toBe(HttpCode.BAD_REQUEST);
   });
 
   test(`output after GET for comments should be an array with at least length 1`, async () => {
