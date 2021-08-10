@@ -93,6 +93,7 @@ articlesRouter.get(`/category/:id`, async (req, res) => {
 
 articlesRouter.get(`/:id`, async (req, res) => {
   const {id} = req.params;
+  const {error} = req.query;
 
   try {
     const [article, categories] = await Promise.all([
@@ -101,7 +102,7 @@ articlesRouter.get(`/:id`, async (req, res) => {
     ]);
 
     const sortedComments = article.comments.slice().sort((a, b) => (new Date(b[`created_date`])) - (new Date(a[`created_date`])));
-    res.render(`post`, {DateTimeFormat, categories, article, id, title: `Пост`, sortedComments});
+    res.render(`post`, {DateTimeFormat, categories, article, id, title: `Пост`, sortedComments, error});
   } catch (err) {
     res.status(err.response.status).render(`errors/404`, {title: `Страница не найдена`});
   }
@@ -149,6 +150,23 @@ articlesRouter.post(`/edit/:id`, upload.single(`file-picture`), async (req, res)
   } catch (err) {
     logger.error(err);
     res.redirect(`/articles/add?error=${encodeURIComponent(err.response.data)}`);
+  }
+});
+
+articlesRouter.post(`/:id/comments`, upload.single(`text`), async (req, res) => {
+  const {id} = req.params;
+  const {text} = req.body;
+
+  // временно
+  let comment = {};
+  comment.userId = 1;
+  comment.text = text;
+
+  try {
+    await api.createComment(id, comment);
+    res.redirect(`/articles/${id}`);
+  } catch (error) {
+    res.redirect(`/articles/${id}?error=${encodeURIComponent(error.response.data)}`);
   }
 });
 

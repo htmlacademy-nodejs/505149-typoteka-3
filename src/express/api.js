@@ -3,7 +3,7 @@
 const axios = require(`axios`).default;
 
 const {API_PORT, APP_URL} = require(`../../config`);
-const {TIMEOUT} = require(`../constants`);
+const {TIMEOUT, HttpMethod} = require(`../constants`);
 
 const defaultUrl = `${APP_URL}:${API_PORT}/api/`;
 
@@ -30,7 +30,7 @@ class API {
 
   updateArticle(id, data) {
     return this._load(`/articles/${id}`, {
-      method: `PUT`,
+      method: HttpMethod.PUT,
       data
     });
   }
@@ -49,14 +49,14 @@ class API {
 
   async createArticle(data) {
     return this._load(`/articles`, {
-      method: `POST`,
+      method: HttpMethod.POST,
       data
     });
   }
 
   createComment(id, data) {
     return this._load(`/articles/${id}/comments`, {
-      method: `POST`,
+      method: HttpMethod.POST,
       data
     });
   }
