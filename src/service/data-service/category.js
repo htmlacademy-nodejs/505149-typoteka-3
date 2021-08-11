@@ -16,13 +16,7 @@ class CategoryService {
         attributes: [
           `id`,
           `title`,
-          [
-            Sequelize.fn(
-                `COUNT`,
-                `*`
-            ),
-            `count`
-          ]
+          [Sequelize.fn(`COUNT`, `*`), `count`]
         ],
         group: [Sequelize.col(`category.id`)],
         include: [{
