@@ -10,12 +10,16 @@ class SearchService {
   }
 
   async findAll({offset, limit, query}) {
+    const queryWithCapFirst = query.charAt(0).toUpperCase() + query.slice(1);
+    console.log(query, queryWithCapFirst);
     const include = [Aliase.CATEGORIES];
     const order = [[`created_date`, `DESC`]];
     const where = {
       title: {
-        [Op.substring]: query
-        // как сделать независимость от регистра?
+        [Op.or]: [{
+          [Op.substring]: query,
+          [Op.substring]: queryWithCapFirst
+        }]
       }
     };
 
