@@ -56,7 +56,7 @@ articlesRouter.post(`/add`, upload.single(`file-picture`), async (req, res) => {
     fulltext: body.fulltext,
     title: body[`title`],
     categories: ensureArray(body.category),
-    // временно
+    // TODO: после внедрения user
     userId: 2
   };
 
@@ -150,7 +150,7 @@ articlesRouter.post(`/edit/:id`, upload.single(`file-picture`), async (req, res)
     fulltext: body.fulltext,
     title: body[`title`],
     categories: ensureArray(body.category),
-    // временно
+    // TODO: после внедрения user
     userId: 1
   };
 
@@ -167,7 +167,7 @@ articlesRouter.post(`/:id/comments`, upload.single(`text`), async (req, res) => 
   const {id} = req.params;
   const {text} = req.body;
 
-  // временно
+  // TODO: нужно будет поправить после внедрения user
   let comment = {};
   comment.userId = 1;
   comment.text = text;
