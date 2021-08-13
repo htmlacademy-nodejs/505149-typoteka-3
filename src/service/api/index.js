@@ -2,6 +2,8 @@
 
 const {Router} = require(`express`);
 
+const sequelize = require(`../database/sequelize`);
+const defineModels = require(`../models`);
 const article = require(`../api/article`);
 const category = require(`../api/category`);
 const search = require(`../api/search`);
@@ -13,12 +15,14 @@ const {
   SearchService,
 } = require(`../data-service`);
 
-const createApi = async (db, logger) => {
+defineModels(sequelize);
+
+const createApi = async () => {
   const agregatingRouter = new Router();
 
-  category(agregatingRouter, new CategoryService(db, logger), new ArticleService(db, logger));
-  article(agregatingRouter, new ArticleService(db, logger), new CommentService(db, logger));
-  search(agregatingRouter, new SearchService(db, logger));
+  category(agregatingRouter, new CategoryService(sequelize));
+  article(agregatingRouter, new ArticleService(sequelize), new CommentService(sequelize));
+  search(agregatingRouter, new SearchService(sequelize));
 
   return agregatingRouter;
 };

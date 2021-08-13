@@ -8,7 +8,7 @@ const {getRandomInt, shuffle, makeMockData, DateRestrict} = require(`../../utils
 const {TXT_FILES_DIR} = require(`../../constants`);
 
 const logger = getLogger({
-  name: `api-server-sql`,
+  name: `api-fill-sql`,
 });
 
 const FILE_NAME = `fill-db.sql`;
@@ -78,7 +78,7 @@ ${createArticlesAndCategoriesRelations(amount, mockData.categories.length)}
 };
 
 module.exports = {
-  name: `--fill`,
+  name: `--fillsql`,
   async run(args) {
     const [qty] = args;
     const amount = Number.parseInt(qty, 10) || DEFAULT_COUNT;

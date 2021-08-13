@@ -6,45 +6,64 @@ const {HttpCode} = require(`../../constants`);
 const articleValidator = require(`../middlewares/article-validator`);
 const articleExist = require(`../middlewares/article-exist`);
 const commentValidator = require(`../middlewares/comment-validator`);
+const routeParamsValidator = require(`../middlewares/route-params-validator`);
 const {getLogger} = require(`../../lib/logger`);
-
-const ARTICLES_PER_PAGE = 8;
 
 const route = new Router();
 const logger = getLogger({
-  name: `api-server`,
+  name: `api-server-article`,
 });
 
 module.exports = (app, articleService, commentService) => {
   app.use(`/articles`, route);
 
   route.get(`/`, async (req, res) => {
-    const {limit = ARTICLES_PER_PAGE, offset = 0} = req.query;
+    const {limit, offset, comments} = req.query;
+    let result;
 
-    const result = await articleService.findPage({limit, offset});
+    try {
+      if (limit || offset) {
+        result = await articleService.findPage({limit, offset, comments});
+      } else {
+        result = await articleService.findAll(comments);
+      }
 
-    if (!result) {
-      logger.error(`Error status - ${HttpCode.NOT_FOUND}`);
-      return res.status(HttpCode.NOT_FOUND)
-        .send(`Did not find articles`);
+      res.status(HttpCode.OK).json(result);
+    } catch (err) {
+      logger.error(`Error status - ${HttpCode.INTERNAL_SERVER_ERROR}`);
+      res.status(HttpCode.INTERNAL_SERVER_ERROR).send(err);
     }
-
-    return res.status(HttpCode.OK)
-        .json(result);
   });
 
-  route.get(`/:articleId`, async (req, res) => {
+  route.get(`/:articleId`, routeParamsValidator, async (req, res) => {
     const {articleId} = req.params;
-    const article = await articleService.findOne(articleId);
+    const {comments} = req.query;
+    const article = await articleService.findOne(articleId, comments);
 
     if (!article) {
-      logger.error(`Did not find article with ${articleId}`);
+      logger.error(`Error status - ${HttpCode.NOT_FOUND}, url: /api/articles${req.url}`);
       return res.status(HttpCode.NOT_FOUND)
         .send(`Did not find article with ${articleId}`);
     }
 
     return res.status(HttpCode.OK)
         .json(article);
+  });
+
+  route.get(`/category/:categoryId`, routeParamsValidator, async (req, res) => {
+    const {categoryId} = req.params;
+    const {limit, offset} = req.query;
+
+    const result = await articleService.findByCategory({limit, offset, categoryId});
+
+    if (!result) {
+      logger.error(`Did not find articles with category ${categoryId}`);
+      return res.status(HttpCode.NOT_FOUND)
+        .send(`Did not find articles with category ${categoryId}`);
+    }
+
+    return res.status(HttpCode.OK)
+      .json(result);
   });
 
   route.post(`/`, articleValidator, async (req, res) => {
@@ -59,67 +78,60 @@ module.exports = (app, articleService, commentService) => {
       .json(article);
   });
 
-  route.put(`/:articleId`, articleValidator, async (req, res) => {
+  route.put(`/:articleId`, [routeParamsValidator, articleValidator], async (req, res) => {
     const {articleId} = req.params;
-    const article = await articleService.findOne(articleId);
 
-    if (!article) {
-      logger.error(`Did not find article with ${articleId}`);
+    const isArticleUpdated = await articleService.update(articleId, req.body);
+
+    if (!isArticleUpdated) {
+      logger.error(`Error status - ${HttpCode.NOT_FOUND}, url: /api/articles${req.url}`);
       return res.status(HttpCode.NOT_FOUND)
         .send(`Did not find article with ${articleId}`);
     }
 
-    const updatedArticle = await articleService.update(articleId, req.body);
-
-    return res.status(HttpCode.OK)
-      .json(updatedArticle);
+    return res.status(HttpCode.OK).send(`Updated`);
   });
 
-  route.delete(`/:articleId`, async (req, res) => {
+  route.delete(`/:articleId`, routeParamsValidator, async (req, res) => {
     const {articleId} = req.params;
-    const article = await articleService.delete(articleId);
+    const isArticleDeleted = await articleService.drop(articleId);
 
-    if (!article) {
-      logger.error(`Did not find article with ${articleId}`);
-      return res.status(HttpCode.NOT_FOUND)
-        .send(`Did not find article with ${articleId}`);
+    if (!isArticleDeleted) {
+      logger.error(`Error status - ${HttpCode.INTERNAL_SERVER_ERROR}`);
+      return res.status(HttpCode.INTERNAL_SERVER_ERROR).send(`Can not delete article`);
     }
 
-    return res.status(HttpCode.OK)
-      .json(article);
+    return res.status(HttpCode.OK).send(`Deleted!`);
   });
 
-  route.get(`/:articleId/comments`, articleExist(articleService), async (req, res) => {
-    const {article} = res.locals;
-
-    const comments = await commentService.findAll(article.id);
+  route.get(`/:articleId/comments`, [routeParamsValidator, articleExist(articleService)], async (req, res) => {
+    const {articleId} = req.params;
+    const comments = await commentService.findAll(articleId);
 
     if (!comments) {
       logger.error(`Error status - ${HttpCode.NOT_FOUND}`);
-      return res.status(HttpCode.NOT_FOUND).send(`Can not find comments for article with id ${article.id}.`);
+      return res.status(HttpCode.NOT_FOUND).send(`Can not find comments for article with id ${articleId}.`);
     }
 
-    return res.status(HttpCode.OK)
-      .json(comments);
+    return res.status(HttpCode.OK).json(comments);
   });
 
-  route.delete(`/:articleId/comments/:commentId`, articleExist(articleService), async (req, res) => {
+  route.delete(`/:articleId/comments/:commentId`, [routeParamsValidator, articleExist(articleService)], async (req, res) => {
     const {commentId} = req.params;
-    const deletedComment = await commentService.delete(commentId);
+    const isCommentDeleted = await commentService.drop(commentId);
 
-    if (!deletedComment) {
-      logger.error(`Did not find comment with ${commentId}`);
+    if (!isCommentDeleted) {
+      logger.error(`Error status - ${HttpCode.NOT_FOUND}`);
       return res.status(HttpCode.NOT_FOUND)
-        .send(`Did not find comment with ${commentId}`);
+        .send(`Comment not found`);
     }
 
-    return res.status(HttpCode.OK)
-      .json(deletedComment);
+    return res.status(HttpCode.OK).send(`Deleted!`);
   });
 
-  route.post(`/:articleId/comments`, [articleExist(articleService), commentValidator], async (req, res) => {
-    const {article} = res.locals;
-    const comment = await commentService.create(article.id, req.body);
+  route.post(`/:articleId/comments`, [routeParamsValidator, articleExist(articleService), commentValidator], async (req, res) => {
+    const {articleId} = req.params;
+    const comment = await commentService.create(articleId, req.body);
 
     if (!comment) {
       logger.error(`Error status - ${HttpCode.INTERNAL_SERVER_ERROR}`);

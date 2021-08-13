@@ -13,9 +13,21 @@ head
     a.pagination__item.pagination__item--active{
       pointer-events: none;
     }
+    .server-error{
+      border-radius: 10px;
+      color: white;
+      background-color: tomato;
+      margin: 20px 0;
+      padding: 10px;
+    }
 body
   mixin time(date)
     | #{new DateTimeFormat(`ru-Ru`, {day: `numeric`, month: `numeric`, year: `numeric`, hour: `numeric`, minute: `numeric`, second: `numeric`}).format(date)}
+
+  mixin errorMessage(message)
+    if message
+      .server-error= message
+
   mixin pagination(page, totalPages, width, prefix)
     -
       let start = page - width;
@@ -44,5 +56,5 @@ body
           li
             a.pagination__button.button.button--forward(href=`${prefix}page=${page + 1}` aria-label='Страница вперед') Вперёд
   block content
-  script(src='js/vendor.js')
-  script(src='js/main.js')
+  script(src='/js/vendor.js')
+  script(src='/js/main.js')

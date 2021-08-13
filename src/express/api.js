@@ -2,71 +2,63 @@
 
 const axios = require(`axios`).default;
 
-const {getLogger} = require(`../lib/logger`);
 const {API_PORT, APP_URL} = require(`../../config`);
+const {TIMEOUT, HttpMethod} = require(`../constants`);
 
-const TIMEOUT = 1000;
 const defaultUrl = `${APP_URL}:${API_PORT}/api/`;
 
-const logger = getLogger({
-  name: `api-axios`,
-});
-
 class API {
-  constructor(baseUrl, timeout) {
-    this._baseUrl = baseUrl;
-    this._timeout = timeout;
+  constructor(baseURL, timeout) {
+    this._http = axios.create({
+      baseURL,
+      timeout
+    });
   }
 
-  async getArticles({limit, offset}) {
-    const response = await axios.get(`${this._baseUrl}articles`, {params: {offset, limit}});
+  async _load(url, options) {
+    const response = await this._http.request({url, ...options});
     return response.data;
   }
 
-  async getArticle(id) {
-    try {
-      const {data: article} = await axios.get(`${this._baseUrl}articles/${id}`);
-      return article;
-    } catch (error) {
-      return logger.error(`Did not find article: ${error.message}`);
-    }
+  getArticles({offset, limit, comments}) {
+    return this._load(`/articles`, {params: {offset, limit, comments}});
   }
 
-  async search(query) {
-    try {
-      const {data: articles} = await axios.get(`${this._baseUrl}search?query=${query}`);
-      return articles;
-    } catch (error) {
-      return logger.error(`Error while search: ${error.message}`);
-    }
+  getArticle(id, comments) {
+    return this._load(`/articles/${id}`, {params: {comments}});
   }
 
-  async getCategories() {
-    const {data: categories} = await axios.get(`${this._baseUrl}categories`);
-    return categories;
+  updateArticle(id, data) {
+    return this._load(`/articles/${id}`, {
+      method: HttpMethod.PUT,
+      data
+    });
   }
 
-  async getArticlesByCategory(id) {
-    const {data: articles} = await axios.get(`${this._baseUrl}categories/${id}`);
-    return articles;
+  search({offset, limit, query}) {
+    return this._load(`/search`, {params: {offset, limit, query}});
+  }
+
+  async getCategories(needCount) {
+    return this._load(`/categories`, {params: {needCount}});
+  }
+
+  async getArticlesByCategory({id, offset, limit}) {
+    return this._load(`/articles/category/${id}`, {params: {offset, limit}});
   }
 
   async createArticle(data) {
-    try {
-      const {data: article} = await axios({
-        method: `post`,
-        url: `${this._baseUrl}articles`,
-        data
-      });
-      return article;
-    } catch (error) {
-      return logger.error(`Can not create article: ${error.message}`);
-    }
+    return this._load(`/articles`, {
+      method: HttpMethod.POST,
+      data
+    });
   }
 
-  async getComments(id) {
-    const {data: comments} = await axios.get(`${this._baseUrl}articles/${id}/comments`);
-    return comments;
+  createComment(id, data) {
+    return this._load(`/articles/${id}/comments`, {
+      method: HttpMethod.POST,
+      data
+    });
   }
 }
 

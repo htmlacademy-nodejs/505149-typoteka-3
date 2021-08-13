@@ -2,12 +2,14 @@
 
 const {Router} = require(`express`);
 const {DateTimeFormat} = require(`intl`);
-const formidable = require(`formidable`);
+const multer = require(`multer`);
 const path = require(`path`);
+const {nanoid} = require(`nanoid`);
 
 const {getLogger} = require(`../../lib/logger`);
-const {dateToTime} = require(`../../lib/utils`);
+const {ensureArray} = require(`../../utils`);
 const api = require(`../api`).getAPI();
+const {ARTICLES_PER_PAGE, MAX_FILE_SIZE, ALLOWED_TYPES, MULTER_ERRORS} = require(`../../constants`);
 
 const UPLOAD_DIR = `../upload/img/`;
 
@@ -16,116 +18,165 @@ const articlesRouter = new Router();
 const uploadDirAbsolute = path.resolve(__dirname, UPLOAD_DIR);
 
 const logger = getLogger({
-  name: `front-server-formidable`,
+  name: `articles-routes`,
+});
+
+const storage = multer.diskStorage({
+  destination: uploadDirAbsolute,
+  filename: (req, file, cb) => {
+    const uniqueName = nanoid(10);
+    const extension = file.originalname.split(`.`).pop();
+    cb(null, `${uniqueName}.${extension}`);
+  }
+});
+
+const upload = multer({
+  storage,
+  limits: {fileSize: MAX_FILE_SIZE},
+  fileFilter: (req, file, cb) => {
+    if (ALLOWED_TYPES.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error(MULTER_ERRORS.NOT_IMAGE), false);
+    }
+  }
 });
 
 articlesRouter.get(`/add`, async (req, res) => {
+  const {error} = req.query;
   const categories = await api.getCategories();
-  res.render(`new-post`, {DateTimeFormat, title: `Публикация`, categories});
+  res.render(`new-post`, {DateTimeFormat, title: `Публикация`, categories, error});
 });
 
-articlesRouter.post(`/add`, async (req, res) => {
-  const categories = await api.getCategories();
-  const allowedTypes = [`image/jpeg`, `image/png`];
-  let isAllowedFormat;
-  let article = {category: []};
+articlesRouter.post(`/add`, upload.single(`file-picture`), async (req, res) => {
+  const {body, file} = req;
+  const articleData = {
+    picture: file.filename,
+    announce: body.announce,
+    fulltext: body.fulltext,
+    title: body[`title`],
+    categories: ensureArray(body.category),
+    // TODO: после внедрения user
+    userId: 2
+  };
 
-  const formData = new formidable.IncomingForm({maxFileSize: 2 * 1024 * 1024});
   try {
-    formData.parse(req)
-      .on(`field`, (name, field) => {
-        if (name === `category`) {
-          article[name].push(field);
-        } else {
-          article[name] = field;
-        }
-      })
-      .on(`fileBegin`, (name, file) => {
-        if (!allowedTypes.includes(file.type)) {
-          isAllowedFormat = false;
-        } else {
-          isAllowedFormat = true;
-          file.path = uploadDirAbsolute + `/` + file.name;
-        }
-      })
-      .on(`file`, (name, file) => {
-        article.picture = file.path.match(/\/([^\/]+)\/?$/)[1];
-      })
-      .on(`aborted`, () => {
-        logger.error(`Request aborted by the user.`);
-      })
-      .on(`error`, async (err) => {
-        logger.error(`There is error while parsing form data. ${err}`);
-
-        article.picture = ``;
-        if (categories.length === 0) {
-          categories = await api.getCategories();
-        }
-
-        res.render(`new-post`, {article, DateTimeFormat, title: `Публикация`, categories});
-      })
-      .on(`end`, async () => {
-        if (!article[`created_date`]) {
-          article[`created_date`] = Date.now();
-        } else {
-          article[`created_date`] = new Date(dateToTime(`d.m.y`, article[`created_date`])).toISOString();
-        }
-        if (isAllowedFormat) {
-          const result = await api.createArticle(article);
-          if (result) {
-            return res.redirect(`/my`);
-          }
-          return formData.emit(`error`, `Did not create article.`);
-        } else {
-          return formData.emit(`error`, `Not correct file's extension.`);
-        }
-      });
-  } catch (error) {
-    logger.error(`Error happened: ${error}`);
+    await api.createArticle(articleData);
+    res.redirect(`/my`);
+  } catch (err) {
+    logger.error(err);
+    res.redirect(`/articles/add?error=${encodeURIComponent(err.response.data)}`);
   }
 });
 
 articlesRouter.get(`/categories`, async (req, res) => {
-  const categories = await api.getCategories();
+  const categories = await api.getCategories(false);
 
   res.render(`all-categories`, {title: `Категории`, categories});
 });
 
 articlesRouter.get(`/category/:id`, async (req, res) => {
   const {id} = req.params;
-  const categoryId = Number.parseInt(id, 10);
-  const categories = await api.getCategories();
-  const selectedCategory = categories.find((it) => it.id === categoryId);
-  const articlesByCategory = await api.getArticlesByCategory(categoryId);
+  let {page = 1} = req.query;
+  page = +page;
 
-  if (articlesByCategory.length) {
-    res.render(`articles-by-category`, {title: `Статьи по категории`, categories, selectedCategory, articlesByCategory, id, DateTimeFormat});
-  } else {
-    res.status(404).render(`errors/404`, {title: `Страница не найдена`, msg: `Нет статей такой категории`});
-  }
+  const limit = ARTICLES_PER_PAGE;
+  const offset = (page - 1) * ARTICLES_PER_PAGE;
+
+  const [{count, articles}, categories] = await Promise.all([
+    api.getArticlesByCategory({limit, offset, id}),
+    api.getCategories(true)
+  ]);
+
+  const totalPages = Math.ceil(count / ARTICLES_PER_PAGE);
+
+  res.render(`articles-by-category`, {
+    title: `Посты по категории`,
+    categories,
+    articles,
+    id,
+    DateTimeFormat,
+    page,
+    totalPages
+  });
 });
 
 articlesRouter.get(`/:id`, async (req, res) => {
   const {id} = req.params;
-  const article = await api.getArticle(id);
-  const categories = await api.getCategories();
-  const sortedComments = article.comments.slice().sort((a, b) => (new Date(b[`created_date`])) - (new Date(a[`created_date`])));
+  const {error} = req.query;
 
-  res.render(`post`, {DateTimeFormat, article, title: `Пост`, categories, sortedComments});
+  try {
+    const [article, categories] = await Promise.all([
+      api.getArticle(id, true),
+      api.getCategories(true)
+    ]);
+
+    const sortedComments = article.comments.slice().sort((a, b) => (new Date(b[`created_date`])) - (new Date(a[`created_date`])));
+    res.render(`post`, {DateTimeFormat, categories, article, id, title: `Пост`, sortedComments, error});
+  } catch (err) {
+    res.status(err.response.status).render(`errors/404`, {title: `Страница не найдена`});
+  }
 });
 
 articlesRouter.get(`/edit/:id`, async (req, res) => {
   const {id} = req.params;
-  const categories = await api.getCategories();
-  const article = await api.getArticle(id);
-  if (categories.length === 0) {
-    categories = await api.getCategories();
-  }
+  const {error} = req.query;
 
-  if (article) {
-    res.render(`new-post`, {article, DateTimeFormat, title: `Публикация`, categories});
-  } else {
-    res.status(404).render(`errors/404`, {title: `Страница не найдена`});
+  try {
+    const [article, categories] = await Promise.all([
+      api.getArticle(id),
+      api.getCategories(false)
+    ]);
+
+    res.render(`new-post`, {
+      article,
+      DateTimeFormat,
+      categories,
+      id,
+      title: `Публикация`,
+      error
+    });
+  } catch (err) {
+    res.status(err.response.status).render(`errors/404`, {title: `Страница не найдена`});
+  }
+});
+
+articlesRouter.post(`/edit/:id`, upload.single(`file-picture`), async (req, res) => {
+  const {body, file} = req;
+  const {id} = req.params;
+  const articleData = {
+    picture: file ? file.filename : body[`old-image`],
+    announce: body.announce,
+    fulltext: body.fulltext,
+    title: body[`title`],
+    categories: ensureArray(body.category),
+    // TODO: после внедрения user
+    userId: 1
+  };
+
+  try {
+    await api.updateArticle(id, articleData);
+    res.redirect(`/my`);
+  } catch (err) {
+    logger.error(err);
+    res.redirect(`/articles/add?error=${encodeURIComponent(err.response.data)}`);
+  }
+});
+
+articlesRouter.post(`/:id/comments`, upload.single(`text`), async (req, res) => {
+  const {id} = req.params;
+  const {text} = req.body;
+
+  // TODO: нужно будет поправить после внедрения user
+  let comment = {};
+  comment.userId = 1;
+  comment.text = text;
+
+  try {
+    await api.createComment(id, comment);
+    res.redirect(`/articles/${id}`);
+  } catch (error) {
+    res.redirect(`/articles/${id}?error=${encodeURIComponent(error.response.data)}`);
   }
 });
 

@@ -22,8 +22,8 @@ block content
                 b.publication__list-name Александр Петров
                 time.publication__item-time(datetime=comment[`created_date`])
                   +time(new Date(comment[`created_date`]))
-              a.publication__item-text(href=`/articles/${comment[`article_id`]}#postcomments`)= comment.text
-              p.publication__text-strong= comment.articleTitle
+              p.publication__item-text= comment.text
+              a.publication__text-strong(href=`/articles/${comment[`articleId`]}#postcomments`)= (articles.find((it) => it.id === comment.articleId).title)
               button.publication__button.button.button--close-item(type='button')
                 span.visually-hidden Закрыть строку списка
     include partials/footer.pug

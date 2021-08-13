@@ -3,32 +3,18 @@
 const {Router} = require(`express`);
 
 const {HttpCode} = require(`../../constants`);
-const {getLogger} = require(`../../lib/logger`);
 
 const route = new Router();
-const logger = getLogger({
-  name: `api-server`,
-});
 
 module.exports = (app, service) => {
   app.use(`/search`, route);
 
   route.get(`/`, async (req, res) => {
-    const {query = ``} = req.query;
+    const {offset, limit, query} = req.query;
 
-    if (!query) {
-      logger.error(`Empty query...`);
-      res.status(HttpCode.BAD_REQUEST).send(null);
-      return;
-    }
+    const searchResults = await service.findAll({offset, limit, query});
 
-    const searchResults = await service.findAll(query.toLowerCase());
-
-    if (searchResults.length) {
-      res.status(HttpCode.OK).json(searchResults);
-    } else {
-      logger.info(`Did not find articles`);
-      res.status(HttpCode.NOT_FOUND).send(null);
-    }
+    res.status(HttpCode.OK)
+    .json(searchResults);
   });
 };

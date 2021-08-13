@@ -4,11 +4,15 @@ const {Router} = require(`express`);
 const {DateTimeFormat} = require(`intl`);
 
 const {getSortedByDateComments} = require(`../../lib/utils`);
+const {getLogger} = require(`../../lib/logger`);
 const api = require(`../api`).getAPI();
-
-const ARTICLES_PER_PAGE = 8;
+const {ARTICLES_PER_PAGE} = require(`../../constants`);
 
 const mainRouter = new Router();
+
+const logger = getLogger({
+  name: `main-routes`,
+});
 
 mainRouter.get(`/`, async (req, res) => {
   let {page = 1} = req.query;
@@ -16,24 +20,33 @@ mainRouter.get(`/`, async (req, res) => {
 
   const limit = ARTICLES_PER_PAGE;
   const offset = (page - 1) * ARTICLES_PER_PAGE;
-  const {count, articles} = await api.getArticles({limit, offset});
 
-  const totalPages = Math.ceil(count / ARTICLES_PER_PAGE);
-  const categories = await api.getCategories();
-  const articlesId = articles.map((it) => it.id);
-  const sortedByQtyOfComments = articles.slice().sort((a, b) => b.comments.length - a.comments.length);
-  const sortedByDateComments = (await getSortedByDateComments(articlesId)).slice(0, 4);
+  const allArticles = await api.getArticles({comments: true});
 
-  res.render(`main`, {
-    articles,
-    sortedByQtyOfComments,
-    title: `Типотека`,
-    DateTimeFormat,
-    sortedByDateComments,
-    categories,
-    page,
-    totalPages,
-  });
+  try {
+    const [{count, articles}, categories] = await Promise.all([
+      api.getArticles({limit, offset, comments: true}),
+      api.getCategories(true)
+    ]);
+
+    const totalPages = Math.ceil(count / ARTICLES_PER_PAGE);
+    const sortedByQtyOfComments = allArticles.slice().sort((a, b) => b.comments.length - a.comments.length).slice(0, 4);
+    const sortedByDateComments = (await getSortedByDateComments(allArticles)).slice(0, 4);
+
+    return res.render(`main`, {
+      articles,
+      sortedByQtyOfComments,
+      title: `Типотека`,
+      DateTimeFormat,
+      sortedByDateComments,
+      categories,
+      page,
+      totalPages,
+    });
+  } catch (error) {
+    logger.error(error.message);
+    return res.render(`errors/500`, {title: `Ошибка сервера`});
+  }
 });
 
 mainRouter.get(`/registration`, (req, res) => res.render(`registration`, {title: `Регистрация`}));

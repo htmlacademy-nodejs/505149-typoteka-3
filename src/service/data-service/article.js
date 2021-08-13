@@ -1,184 +1,123 @@
 'use strict';
 
+const Sequelize = require(`sequelize`);
+
+const Aliase = require(`../models/aliases`);
+const {getLogger} = require(`../../lib/logger`);
+
+const logger = getLogger({
+  name: `data-service-article`
+});
+
 class ArticleService {
-  constructor(db, logger) {
-    this._db = db;
-    this._logger = logger;
+  constructor(sequelize) {
+    this._Article = sequelize.models.article;
+    this._Comment = sequelize.models.comment;
+    this._Category = sequelize.models.category;
   }
 
-  async findAll() {
-    const {Article} = this._db.models;
+  async findAll(needComments) {
+    const include = [Aliase.CATEGORIES];
+    const order = [[`created_date`, `DESC`]];
 
-    try {
-      const articles = await Article.findAll({
-        order: [
-          [`created_date`, `DESC`],
-        ]
-      });
-      const preparedArticles = [];
-
-      for (const article of articles) {
-        const categories = await article.getCategories({raw: true});
-        const comments = await article.getComments({raw: true});
-        article.dataValues.category = categories;
-        article.dataValues.comments = comments;
-        preparedArticles.push(article.dataValues);
-      }
-
-      return preparedArticles;
-    } catch (error) {
-      this._logger.error(`Can not find articles. Error: ${error}`);
-
-      return [];
+    if (needComments) {
+      include.push(Aliase.COMMENTS);
     }
+    const articles = await this._Article.findAll({include, order});
+    return articles.map((item) => item.get());
   }
 
-  async findPage({limit, offset}) {
-    const {Article} = this._db.models;
+  async findPage({limit, offset, comments}) {
+    const include = [Aliase.CATEGORIES];
+    const order = [[`created_date`, `DESC`]];
 
-    try {
-      const {count, rows} = await Article.findAndCountAll({
-        limit,
-        offset,
-        order: [
-          [`created_date`, `DESC`],
-        ]
-      });
-      const articles = [];
-
-      for (const article of rows) {
-        const categories = await article.getCategories({raw: true});
-        const comments = await article.getComments({raw: true});
-        article.dataValues.category = categories;
-        article.dataValues.comments = comments;
-        articles.push(article.dataValues);
-      }
-      return {count, articles};
-    } catch (error) {
-      this._logger.error(`Can not find articles. Error: ${error}`);
-
-      return null;
+    if (comments) {
+      include.push(Aliase.COMMENTS);
     }
+
+    const {count, rows} = await this._Article.findAndCountAll({
+      limit,
+      offset,
+      include,
+      order,
+      distinct: true
+    });
+    return {count, articles: rows};
   }
 
-  async findOne(id) {
-    const {Article} = this._db.models;
-    const articleId = Number.parseInt(id, 10);
-
-    try {
-      const article = await Article.findByPk(articleId);
-      const comments = await article.getComments({raw: true});
-      const categories = await article.getCategories({raw: true});
-      article.dataValues.category = categories;
-      article.dataValues.comments = comments;
-
-      return article.dataValues;
-    } catch (error) {
-      this._logger.error(`Can not find article. Error: ${error}`);
-
-      return null;
+  async findOne(id, needComments) {
+    const include = [Aliase.CATEGORIES];
+    if (needComments) {
+      include.push(Aliase.COMMENTS);
     }
+    return await this._Article.findByPk(id, {include});
   }
 
-  async findByCategory(id) {
-    const categoryId = Number.parseInt(id, 10);
-    const articles = await this.findAll();
-    return articles.filter((article) => article.category.find((category) => category.id === categoryId));
-  }
-
-  async create(article) {
-    const {sequelize} = this._db;
-    const {Category, Article, User} = this._db.models;
-    const allCategories = await Category.findAll({raw: true});
-    const categoriesIds = allCategories.reduce((acc, item) => {
-      if (article.category.filter((cat) => cat === item.title).length) {
-        acc.push(item.id);
-      }
-      return acc;
-    }, []);
-
-    try {
-      const articleCategories = await Category.findAll({
+  async findByCategory({limit, offset, categoryId}) {
+    const include = [Aliase.CATEGORIES, Aliase.COMMENTS];
+    const {count, rows} = await this._Article.findAndCountAll({
+      attributes: [`id`],
+      include: [{
+        model: this._Category,
+        as: Aliase.CATEGORIES,
+        attributes: [],
         where: {
-          id: {
-            [sequelize.Sequelize.Op.or]: categoriesIds,
-          },
+          id: categoryId
+        },
+      }],
+      limit,
+      offset,
+      raw: true
+    });
+
+    const articles = await this._Article.findAll({
+      include,
+      where: {
+        id: {
+          [Sequelize.Op.in]: rows.map((it) => it.id)
         }
-      });
+      },
+    });
 
-      const user = await User.findByPk(1);
-      const newArticle = await user.createArticle(article);
-      await newArticle.addCategories(articleCategories);
+    return {count, articles};
+  }
 
-      return await Article.findByPk(newArticle.id, {raw: true});
+  async create(articleData) {
+    try {
+      const article = await this._Article.create(articleData);
+      await article.addCategories(articleData.categories);
+      return article.get();
     } catch (error) {
-      this._logger.error(`Can not create article. Error: ${error}`);
-
-      return null;
+      return logger.error(error);
     }
   }
 
   async update(id, article) {
-    const {sequelize} = this._db;
-    const {Article, Category} = this._db.models;
-    const allCategories = await Category.findAll({raw: true});
-    const categoriesIds = allCategories.reduce((acc, item) => {
-      if (article.category.filter((cat) => cat === item.title).length) {
-        acc.push(item.id);
-      }
-      return acc;
-    }, []);
-
     try {
-      const [rows] = await Article.update(article, {
-        where: {
-          id,
-        }
+      const [affectedRows] = await this._Article.update(article, {
+        where: {id},
       });
-
-      if (!rows) {
-        return null;
-      }
-
-      const updatedArticle = await Article.findByPk(id);
-      const articleCategories = await Category.findAll({
+      const articleCategories = await this._Category.findAll({
         where: {
           id: {
-            [sequelize.Sequelize.Op.or]: categoriesIds,
+            [Sequelize.Op.or]: article.categories,
           },
         }
       });
-      await updatedArticle.addCategories(articleCategories);
-      return await Article.findByPk(updatedArticle.id, {raw: true});
-    } catch (error) {
-      this._logger.error(`Can not update article. Error: ${error}`);
+      const updatedArticle = await this._Article.findByPk(id);
+      await updatedArticle.setCategories(articleCategories);
 
-      return null;
+      return !!affectedRows;
+    } catch (error) {
+      return logger.error(error);
     }
   }
 
-  async delete(id) {
-    const {Article} = this._db.models;
-
-    try {
-      const articleForDelete = await Article.findByPk(id, {raw: true});
-      const deletedRows = await Article.destroy({
-        returning: true,
-        where: {
-          id,
-        }
-      });
-
-      if (!deletedRows) {
-        return null;
-      }
-
-      return articleForDelete;
-    } catch (error) {
-      this._logger.error(`Can not delete article. Error: ${error}`);
-
-      return null;
-    }
+  async drop(id) {
+    const deletedRow = await this._Article.destroy({
+      where: {id}
+    });
+    return !!deletedRow;
   }
 }
 

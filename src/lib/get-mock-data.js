@@ -4,7 +4,7 @@ const fs = require(`fs`).promises;
 
 const {getLogger} = require(`./logger`);
 
-const FILENAME = `mocks.json`;
+const {FILE_NAME} = require(`../constants`);
 
 const logger = getLogger({
   name: `api-server`,
@@ -18,7 +18,7 @@ const getMockData = async () => {
   }
 
   try {
-    const fileContent = await fs.readFile(FILENAME);
+    const fileContent = await fs.readFile(FILE_NAME);
     data = JSON.parse(fileContent);
   } catch (err) {
     logger.error(err);

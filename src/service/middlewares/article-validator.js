@@ -1,24 +1,17 @@
 'use strict';
 
-const {HttpCode} = require(`../../constants`);
+const schema = require(`../schemas/article`);
 
-const articleKeys = [`category`, `announce`, `title`, `fulltext`, `picture`];
+const {HttpCode} = require(`../../constants`);
 
 module.exports = (req, res, next) => {
   const newArticle = req.body;
-  const keys = Object.keys(newArticle);
-  const entries = Object.entries(newArticle);
-  const keysExists = articleKeys.every((key) => keys.includes(key));
-  for (const entry of entries) {
-    if (entry[0] === `category` && !entry[1].length || entry[1] === ``) {
-      return res.status(HttpCode.BAD_REQUEST)
-      .send(`Bad request`);
-    }
-  }
 
-  if (!keysExists) {
+  const {error} = schema.validate(newArticle);
+
+  if (error) {
     return res.status(HttpCode.BAD_REQUEST)
-      .send(`Bad request`);
+      .send(error.details.map((err) => err.message).join(`\n`));
   }
 
   return next();

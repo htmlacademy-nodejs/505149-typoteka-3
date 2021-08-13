@@ -8,70 +8,79 @@ GET http://localhost:3000/api/search?query=как HTTP/1.1
 
 ###
 
-# Запрашивает все объявления done
+# Запрашивает все посты done
 GET http://localhost:3000/api/articles HTTP/1.1
 
 ###
 
-# Запрашивает объявление с идентификатором :id done
+# Запрашивает пост с идентификатором :id done
 
 GET http://localhost:3000/api/articles/2 HTTP/1.1
 
 ###
 
-# Удаление объявления с идентификатором :id
+# Запрашивает все посты категории с идентификатором :categoryId done
 
-DELETE http://localhost:3000/api/articles/8 HTTP/1.1
+GET http://localhost:3000/api/articles/category/2 HTTP/1.1
 
 ###
 
-# Добавление нового объявления done
+# Удаление поста с идентификатором :id
+
+DELETE http://localhost:3000/api/articles/13 HTTP/1.1
+
+###
+
+# Добавление нового поста done
 
 POST http://localhost:3000/api/articles HTTP/1.1
 Content-Type: application/json
 
 {
-  "category": ["Музыка"],
+  "categories": [3, 9],
   "fulltext": "Это один из лучших рок-музыкантов. Ёлки — это не просто красивое дерево. Это прочная древесина. Помните, небольшое количество ежедневных упражнений лучше, чем один раз, но много. Этот смартфон — настоящая находка. Большой и яркий экран, мощнейший процессор — всё это в небольшом гаджете. Игры и программирование разные вещи. Не стоит идти в программисты, если вам нравится только игры.",
   "announce": "Собрать камни бесконечности легко, если вы прирожденный герой.",
   "title": "Новое объявление!",
-  "picture": "forest@2x.jpg"
+  "picture": "forest@2x.jpg",
+  "userId": 2
 }
 
 ###
 
-# Обновление объявления done
+# Обновление поста done
 
-PUT http://localhost:3000/api/articles/10 HTTP/1.1
+PUT http://localhost:3000/api/articles/12 HTTP/1.1
 Content-Type: application/json
 
 {
-  "category": ["Разное"],
-  "fulltext": "Не стоит идти в программисты, если вам нравится только игры.",
-  "announce": "Изменение объявления!",
-  "title": "Куку",
-  "picture": "forest@2x.jpg"
+  "categories": [4, 7],
+  "fulltext": "Изменение объявления! Не стоит идти в программисты, если вам нравится только игры.",
+  "announce": "Какое прекрасное создание! Правда же? Не стоит идти в программисты..",
+  "title": "Прекрасное создание!",
+  "picture": "Q_C00BXTT9.jpg",
+  "userId": 2
 }
 
 ###
 
 # Список комментариев done
 
-GET http://localhost:3000/api/articles/3/comments HTTP/1.1
+GET http://localhost:3000/api/articles/8/comments HTTP/1.1
 
 ###
 
 # Удаляет комментарий done
 
-DELETE http://localhost:3000/api/articles/3/comments/11 HTTP/1.1
+DELETE http://localhost:3000/api/articles/8/comments/24 HTTP/1.1
 
 ###
 
-# Добавляет новый комментарий к публикации done
+# Добавляет новый комментарий к посту done
 
-POST http://localhost:3000/api/articles/10/comments HTTP/1.1
+POST http://localhost:3000/api/articles/12/comments HTTP/1.1
 Content-Type: application/json
 
 {
-  "text": "Это новый комментарий"
+  "text": "Это новый комментарий",
+  "userId": 1
 }
