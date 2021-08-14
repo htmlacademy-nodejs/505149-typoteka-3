@@ -40,7 +40,8 @@ DROP TABLE IF EXISTS users;
 CREATE TABLE users
 (
     id bigserial NOT NULL,
-    name character varying(50) NOT NULL,
+    first_name character varying(50) NOT NULL,
+    last_name character varying(50) NOT NULL,
     email character varying(50) UNIQUE NOT NULL,
     passwordHash character varying(50) NOT NULL CHECK (char_length(passwordHash) > 6),
     avatar character varying(50),

@@ -23,13 +23,15 @@ const logger = getLogger({
 const getUsers = async () => {
   return [
     {
-      name: `Иван Иванов`,
+      firstName: `Иван`,
+      lastName: `Иванов`,
       email: `arteta@gmail.com`,
       passwordHash: await passwordUtils.hash(`ivanov`),
       avatar: `image.jpg`,
     },
     {
-      name: `Сергей Сидоров`,
+      firstName: `Сергей`,
+      lastName: `Сидоров`,
       email: `barguzin@gmail.com`,
       passwordHash: await passwordUtils.hash(`sidorov`),
       avatar: `image2.jpg`,
