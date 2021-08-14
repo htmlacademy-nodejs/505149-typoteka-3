@@ -7,11 +7,11 @@ const {HttpCode} = require(`../../constants`);
 module.exports = (service) => async (req, res, next) => {
   const newUser = req.body;
 
-  const {error} = schema.validate(newUser);
-
-  if (error) {
+  try {
+    await schema.validateAsync(newUser, {abortEarly: false});
+  } catch (err) {
     return res.status(HttpCode.BAD_REQUEST)
-      .send(error.details.map((err) => err.message).join(`\n`));
+    .send(err.details.map((error) => error.message));
   }
 
   const userByEmail = await service.findByEmail(req.body.email);

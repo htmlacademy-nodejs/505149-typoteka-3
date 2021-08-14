@@ -5,10 +5,17 @@ const Joi = require(`joi`);
 const {RegisterMessage} = require(`../../constants`);
 
 module.exports = Joi.object({
-  name: Joi.string().pattern(/[^0-9$&+,:;=?@#|'<>.^*()%!]+$/)
+  firstName: Joi.string().pattern(/[^0-9$&+,:;=?@#|'<>.^*()%!]+$/)
     .required()
     .messages({
-      'string.pattern.base': RegisterMessage.WRONG_EMAIL,
+      'string.pattern.base': RegisterMessage.WRONG_NAME,
+      'any.required': RegisterMessage.REQUIRED_FIELD,
+    }),
+
+  lastName: Joi.string().pattern(/[^0-9$&+,:;=?@#|'<>.^*()%!]+$/)
+    .required()
+    .messages({
+      'string.pattern.base': RegisterMessage.WRONG_NAME,
       'any.required': RegisterMessage.REQUIRED_FIELD,
     }),
 

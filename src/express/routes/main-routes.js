@@ -6,6 +6,7 @@ const {DateTimeFormat} = require(`intl`);
 const {getSortedByDateComments} = require(`../../lib/utils`);
 const {getLogger} = require(`../../lib/logger`);
 const api = require(`../api`).getAPI();
+const upload = require(`../middleware/upload`);
 const {ARTICLES_PER_PAGE} = require(`../../constants`);
 
 const mainRouter = new Router();
@@ -49,7 +50,30 @@ mainRouter.get(`/`, async (req, res) => {
   }
 });
 
-mainRouter.get(`/registration`, (req, res) => res.render(`registration`, {title: `Регистрация`}));
+mainRouter.get(`/register`, (req, res) => {
+  const {error} = req.query;
+  const errors = error.split(`,`);
+  res.render(`registration`, {errors});
+});
+
+mainRouter.post(`/register`, upload.single(`avatar`), async (req, res) => {
+  const {body, file} = req;
+  const userData = {
+    avatar: file.filename,
+    firstName: body[`name`],
+    lastName: body[`surname`],
+    email: body[`user-email`],
+    password: body[`password`],
+    passwordRepeated: body[`repeat-password`]
+  };
+
+  try {
+    await api.createUser(userData);
+    res.redirect(`/login`);
+  } catch (error) {
+    res.redirect(`/register?error=${encodeURIComponent(error.response.data)}`);
+  }
+});
 
 mainRouter.get(`/login`, (req, res) => res.render(`login`, {title: `Войти`}));
 
