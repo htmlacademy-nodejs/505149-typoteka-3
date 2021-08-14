@@ -25,13 +25,13 @@ RIGHT JOIN articles_categories
 GROUP BY id
 ORDER BY count(id) DESC;
 
--- Список публикаций (идентификатор публикации, заголовок публикации, анонс, дата публикации, имя и фамилия автора, контактный email, количество комментариев, наименование категорий). Сначала свежие публикации
+-- Список публикаций (идентификатор публикации, заголовок публикации, анонс, дата публикации, имя автора, контактный email, количество комментариев, наименование категорий). Сначала свежие публикации
 SELECT
   articles.id AS "ID",
   articles.title AS "Заголовок",
   articles.announce AS "Анонс",
   articles.created_date AS "Дата создания",
-  concat(users.first_name, ' ', users.last_name) AS "Имя и фамилия",
+  users.name AS "Имя",
   users.email AS "Email",
   count(comments) AS "Количество комментариев",
   aggr_categories.str_categories as "Жанры"
@@ -54,10 +54,10 @@ LEFT JOIN
   ORDER BY articles.id
 ) aggr_categories
   ON articles.id = aggr_categories.article_id
-GROUP BY articles.id, users.first_name, users.last_name, users.email, aggr_categories.str_categories
+GROUP BY articles.id, users.name, users.email, aggr_categories.str_categories
 ORDER BY articles.id;
 
--- Полная информация определённой публикации (идентификатор публикации, заголовок публикации, анонс, полный текст публикации, дата публикации, путь к изображению, имя и фамилия автора, контактный email, количество комментариев, наименование категорий)
+-- Полная информация определённой публикации (идентификатор публикации, заголовок публикации, анонс, полный текст публикации, дата публикации, путь к изображению, имя автора, контактный email, количество комментариев, наименование категорий)
 SELECT
   articles.id AS "ID",
   articles.title AS "Заголовок",
@@ -65,7 +65,7 @@ SELECT
   articles.fulltext AS "Текст",
   articles.created_date AS "Дата создания",
   articles.picture AS "Путь к изображению",
-  concat(users.first_name, ' ', users.last_name) AS "Имя и фамилия",
+  users.name AS "Имя",
   users.email AS "Email",
   count(comments) AS "Количество комментариев",
   aggr_categories.str_categories as "Жанры"
@@ -89,28 +89,28 @@ LEFT JOIN
 ) aggr_categories
   ON articles.id = aggr_categories.article_id
 WHERE articles.id = 4
-GROUP BY articles.id, users.first_name, users.last_name, users.email, aggr_categories.str_categories;
+GROUP BY articles.id, users.name, users.email, aggr_categories.str_categories;
 
--- Список из 5 свежих комментариев (идентификатор комментария, идентификатор публикации, имя и фамилия автора, текст комментария)
+-- Список из 5 свежих комментариев (идентификатор комментария, идентификатор публикации, имя автора, текст комментария)
 SELECT
 	comments.id as "ID Комментария",
 	articles.id AS "ID Публикации",
-	concat(users.first_name, ' ', users.last_name) AS "Имя и фамилия",
+	users.name AS "Имя",
 	comments."text" AS "Текст комментария"
 FROM "comments"
 LEFT JOIN articles
   ON comments.article_id = articles.id
 LEFT JOIN users
   ON comments.user_id = users.id
-GROUP BY comments.id, articles.id, users.first_name, users.last_name
+GROUP BY comments.id, articles.id, users.name
 ORDER BY comments.created_date DESC
 LIMIT 5;
 
--- Список комментариев для определённой публикации (идентификатор комментария, идентификатор публикации, имя и фамилия автора, текст комментария). Сначала новые комментарии
+-- Список комментариев для определённой публикации (идентификатор комментария, идентификатор публикации, имя автора, текст комментария). Сначала новые комментарии
 SELECT
 	comments.id as "ID Комментария",
 	articles.id AS "ID Объявления",
-	concat(users.first_name, ' ', users.last_name) AS "Имя и фамилия",
+	users.name AS "Имя",
 	comments."text" as "Текст комментария"
 FROM articles
 LEFT JOIN "comments"
@@ -118,7 +118,7 @@ LEFT JOIN "comments"
 LEFT JOIN users
   ON articles.user_id = users.id
 WHERE articles.id = 2
-GROUP BY articles.id, comments.id, users.first_name, users.last_name
+GROUP BY articles.id, comments.id, users.name
 ORDER BY comments.created_date DESC;
 
 -- Обновить заголовок определённой публикации на «Как я встретил Новый год»

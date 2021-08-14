@@ -60,8 +60,8 @@ const createArticlesAndCategoriesRelations = (amount, categoriesQty) => {
 
 const makeFillSql = (amount, mockData) => {
   return `INSERT INTO users VALUES
-(1, 'Иван', 'Иванов', 'asterix@gmail.com', 'qwertyasd', 'image.jpg'),
-(2, 'Сергей', 'Сидоров', 'obelisk@gmail.com', 'qwertyasd', 'image2.jpg');
+(1, 'Иван Иванов', 'asterix@gmail.com', 'qwertyasd', 'image.jpg'),
+(2, 'Сергей Сидоров', 'obelisk@gmail.com', 'qwertyasd', 'image2.jpg');
 
 INSERT INTO categories VALUES
 ${createCategories(mockData.categories)}
