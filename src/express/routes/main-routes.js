@@ -52,8 +52,7 @@ mainRouter.get(`/`, async (req, res) => {
 
 mainRouter.get(`/register`, (req, res) => {
   const {error} = req.query;
-  const errors = error.split(`,`);
-  res.render(`registration`, {errors});
+  res.render(`registration`, {errors: error && error.split(`,`)});
 });
 
 mainRouter.post(`/register`, upload.single(`avatar`), async (req, res) => {
