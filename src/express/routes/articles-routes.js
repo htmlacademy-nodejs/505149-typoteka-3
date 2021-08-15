@@ -37,7 +37,7 @@ articlesRouter.post(`/add`, upload.single(`file-picture`), async (req, res) => {
     await api.createArticle(articleData);
     res.redirect(`/my`);
   } catch (err) {
-    logger.error(err);
+    logger.error(err.message);
     res.redirect(`/articles/add?error=${encodeURIComponent(err.response.data)}`);
   }
 });
@@ -131,8 +131,8 @@ articlesRouter.post(`/edit/:id`, upload.single(`file-picture`), async (req, res)
     await api.updateArticle(id, articleData);
     res.redirect(`/my`);
   } catch (err) {
-    logger.error(err);
-    res.redirect(`/articles/add?error=${encodeURIComponent(err.response.data)}`);
+    logger.error(err.message);
+    res.redirect(`/articles/edit/${id}?error=${encodeURIComponent(err.response.data)}`);
   }
 });
 
@@ -149,6 +149,7 @@ articlesRouter.post(`/:id/comments`, upload.single(`text`), async (req, res) => 
     await api.createComment(id, comment);
     res.redirect(`/articles/${id}`);
   } catch (error) {
+    logger.error(error.message);
     res.redirect(`/articles/${id}?error=${encodeURIComponent(error.response.data)}`);
   }
 });
