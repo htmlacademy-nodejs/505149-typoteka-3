@@ -24,7 +24,7 @@ articlesRouter.get(`/add`, async (req, res) => {
 articlesRouter.post(`/add`, upload.single(`file-picture`), async (req, res) => {
   const {body, file} = req;
   const articleData = {
-    picture: file.filename,
+    picture: file ? file.filename : res.redirect(`/articles/add?error=There is no file was selected.`),
     announce: body.announce,
     fulltext: body.fulltext,
     title: body[`title`],
