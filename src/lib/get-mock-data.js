@@ -7,7 +7,7 @@ const {getLogger} = require(`./logger`);
 const {FILE_NAME} = require(`../constants`);
 
 const logger = getLogger({
-  name: `api-server`,
+  name: `api-server-make-mock-data`,
 });
 
 let data = [];
