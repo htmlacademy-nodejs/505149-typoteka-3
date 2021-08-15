@@ -26,5 +26,5 @@ block content
                   +time(new Date(article[`created_date`]))
                 a.search__link(href=`/articles/${article.id}`)
                   |  #{article.title}
-    +pagination(page, totalPages, 2, `?`)
+    +pagination(page, totalPages, 2, `?`, query)
     include partials/footer.pug
