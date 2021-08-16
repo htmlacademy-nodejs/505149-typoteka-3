@@ -1,6 +1,6 @@
 SELECT
   users.first_name AS "Имя",
-	users.last_name AS "Фамилия",
+  users.last_name AS "Фамилия",
 	articles.title AS "Объявление",
   articles.created_date AS "Дата"
 FROM articles
@@ -9,7 +9,7 @@ INNER JOIN users
 
 SELECT
   users.first_name AS "Имя",
-	users.last_name AS "Фамилия",
+  users.last_name AS "Фамилия",
 	articles.title AS "Объявление",
   comments.text AS "Комментарий"
 FROM comments

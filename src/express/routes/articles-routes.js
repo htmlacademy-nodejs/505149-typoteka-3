@@ -2,44 +2,17 @@
 
 const {Router} = require(`express`);
 const {DateTimeFormat} = require(`intl`);
-const multer = require(`multer`);
-const path = require(`path`);
-const {nanoid} = require(`nanoid`);
 
 const {getLogger} = require(`../../lib/logger`);
 const {ensureArray} = require(`../../utils`);
 const api = require(`../api`).getAPI();
-const {ARTICLES_PER_PAGE, MAX_FILE_SIZE, ALLOWED_TYPES, MULTER_ERRORS} = require(`../../constants`);
-
-const UPLOAD_DIR = `../upload/img/`;
+const upload = require(`../middleware/upload`);
+const {ARTICLES_PER_PAGE} = require(`../../constants`);
 
 const articlesRouter = new Router();
 
-const uploadDirAbsolute = path.resolve(__dirname, UPLOAD_DIR);
-
 const logger = getLogger({
   name: `articles-routes`,
-});
-
-const storage = multer.diskStorage({
-  destination: uploadDirAbsolute,
-  filename: (req, file, cb) => {
-    const uniqueName = nanoid(10);
-    const extension = file.originalname.split(`.`).pop();
-    cb(null, `${uniqueName}.${extension}`);
-  }
-});
-
-const upload = multer({
-  storage,
-  limits: {fileSize: MAX_FILE_SIZE},
-  fileFilter: (req, file, cb) => {
-    if (ALLOWED_TYPES.includes(file.mimetype)) {
-      cb(null, true);
-    } else {
-      cb(new Error(MULTER_ERRORS.NOT_IMAGE), false);
-    }
-  }
 });
 
 articlesRouter.get(`/add`, async (req, res) => {
@@ -51,7 +24,7 @@ articlesRouter.get(`/add`, async (req, res) => {
 articlesRouter.post(`/add`, upload.single(`file-picture`), async (req, res) => {
   const {body, file} = req;
   const articleData = {
-    picture: file.filename,
+    picture: file ? file.filename : res.redirect(`/articles/add?error=There is no file was selected.`),
     announce: body.announce,
     fulltext: body.fulltext,
     title: body[`title`],
@@ -64,7 +37,7 @@ articlesRouter.post(`/add`, upload.single(`file-picture`), async (req, res) => {
     await api.createArticle(articleData);
     res.redirect(`/my`);
   } catch (err) {
-    logger.error(err);
+    logger.error(err.message);
     res.redirect(`/articles/add?error=${encodeURIComponent(err.response.data)}`);
   }
 });
@@ -158,8 +131,8 @@ articlesRouter.post(`/edit/:id`, upload.single(`file-picture`), async (req, res)
     await api.updateArticle(id, articleData);
     res.redirect(`/my`);
   } catch (err) {
-    logger.error(err);
-    res.redirect(`/articles/add?error=${encodeURIComponent(err.response.data)}`);
+    logger.error(err.message);
+    res.redirect(`/articles/edit/${id}?error=${encodeURIComponent(err.response.data)}`);
   }
 });
 
@@ -176,6 +149,7 @@ articlesRouter.post(`/:id/comments`, upload.single(`text`), async (req, res) => 
     await api.createComment(id, comment);
     res.redirect(`/articles/${id}`);
   } catch (error) {
+    logger.error(error.message);
     res.redirect(`/articles/${id}?error=${encodeURIComponent(error.response.data)}`);
   }
 });

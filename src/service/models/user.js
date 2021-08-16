@@ -19,13 +19,13 @@ const define = (sequelize) => User.init({
     allowNull: false,
     unique: true,
   },
-  password: {
+  passwordHash: {
     type: DataTypes.STRING,
     allowNull: false,
-    // TODO: Как валидировать длину пароля?
   },
   avatar: {
     type: DataTypes.STRING,
+    allowNull: false,
   },
 }, {
   sequelize,

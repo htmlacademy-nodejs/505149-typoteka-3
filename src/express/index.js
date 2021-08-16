@@ -54,7 +54,7 @@ app.use((req, res) => {
 app.use((err, req, res, _next) => {
   if (err.message === MULTER_ERRORS.NOT_IMAGE || err.message === MULTER_ERRORS.FILE_TOO_LARGE) {
     logger.error(`Error from multer: ${err.message}`);
-    return res.redirect(`/articles/add?error=${encodeURIComponent(err)}`);
+    return res.redirect(`${req.url}?error=${encodeURIComponent(err)}`);
   }
 
   logger.error(`Error status - ${err.status || 500}, ${err}`);

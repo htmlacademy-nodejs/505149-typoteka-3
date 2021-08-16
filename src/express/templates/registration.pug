@@ -9,7 +9,7 @@ block content
       nav.header__nav
         ul.header__nav-list
           li.header__list-item
-            a.header__popup(href='/registration') Регистрация
+            a.header__popup(href='/register') Регистрация
           li.header__list-item
             a.header__enter(href='/login') Вход с паролем
       a.header__search.button.button--search(href='/search' aria-label='Поиск по сайту')
@@ -20,10 +20,10 @@ block content
           a.popup__button.button.button--popup-close(aria-label='Закрыть окно') Закрыть окно
           h2.popup__title Регистрация
           .popup__form.popup__form--active.form.form--register
-            form(action='#' method='get')
+            form(action='/register' method='post' enctype='multipart/form-data' autocomplete='off')
               .form__field
                 label
-                  input(type='email' placeholder='Электронная почта' required)
+                  input(type='email' name='user-email' placeholder='Электронная почта' required)
               .form__field
                 label
                   input(type='text' name='name' placeholder='Имя' required)
@@ -32,20 +32,21 @@ block content
                   input(type='text' name='surname' placeholder='Фамилия')
               .form__field
                 label
-                  input(type='password' placeholder='Пароль' required)
+                  input(type='password' name='password' placeholder='Пароль' required)
               .form__field
                 label
                   input(type='password' name='repeat-password' placeholder='Повтор пароля' required)
-              .form__validation-error
-                p.form__error-message При регистрации произошли ошибки:
-                ul.form__errors
-                  li.form__error Пароль не может состоять из двух букв
-                  li.form__error Фамилия не должна быть смешной
+              if errors
+                .form__validation-error
+                  p.form__error-message При регистрации произошли ошибки:
+                  ul.form__errors
+                    each error in errors
+                      li.form__error #{error}
               .form__image-loader
                 a.form__avatar.avatar
                   img(src='/img/icons/smile.svg' alt='аватар пользователя')
                 label
-                  input.visually-hidden(type='file' name='upload')
+                  input.visually-hidden(type='file' name='avatar')
                 | Загрузить фото профиля
               button.form__submit-btn.form__submit-btn--register.button.button--colored(type='submit') Зарегистрироваться
     include partials/footer.pug

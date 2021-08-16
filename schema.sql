@@ -43,7 +43,7 @@ CREATE TABLE users
     first_name character varying(50) NOT NULL,
     last_name character varying(50) NOT NULL,
     email character varying(50) UNIQUE NOT NULL,
-    password character varying(50) NOT NULL CHECK (char_length(password) > 6),
+    passwordHash character varying(50) NOT NULL CHECK (char_length(passwordHash) > 6),
     avatar character varying(50),
     PRIMARY KEY (id)
 );
