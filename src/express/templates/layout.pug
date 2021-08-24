@@ -56,5 +56,6 @@ body
           li
             a.pagination__button.button.button--forward(href=`${prefix}page=${page + 1}` aria-label='Страница вперед') Вперёд
   block content
+  include partials/footer.pug
   script(src='/js/vendor.js')
   script(src='/js/main.js')

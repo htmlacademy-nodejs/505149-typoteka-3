@@ -26,4 +26,3 @@ block content
               a.publication__text-strong(href=`/articles/${comment[`articleId`]}#postcomments`)= (articles.find((it) => it.id === comment.articleId).title)
               button.publication__button.button.button--close-item(type='button')
                 span.visually-hidden Закрыть строку списка
-    include partials/footer.pug
