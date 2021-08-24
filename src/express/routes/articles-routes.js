@@ -7,6 +7,7 @@ const {getLogger} = require(`../../lib/logger`);
 const {ensureArray} = require(`../../utils`);
 const api = require(`../api`).getAPI();
 const upload = require(`../middleware/upload`);
+const auth = require(`../middleware/auth`);
 const {ARTICLES_PER_PAGE} = require(`../../constants`);
 
 const articlesRouter = new Router();
@@ -15,7 +16,7 @@ const logger = getLogger({
   name: `articles-routes`,
 });
 
-articlesRouter.get(`/add`, async (req, res) => {
+articlesRouter.get(`/add`, auth, async (req, res) => {
   const {user} = req.session;
   const {error} = req.query;
   const categories = await api.getCategories();
@@ -49,7 +50,7 @@ articlesRouter.post(`/add`, upload.single(`file-picture`), async (req, res) => {
   }
 });
 
-articlesRouter.get(`/categories`, async (req, res) => {
+articlesRouter.get(`/categories`, auth, async (req, res) => {
   const {user} = req.session;
   const categories = await api.getCategories(false);
 
@@ -111,7 +112,7 @@ articlesRouter.get(`/:id`, async (req, res) => {
   }
 });
 
-articlesRouter.get(`/edit/:id`, async (req, res) => {
+articlesRouter.get(`/edit/:id`, auth, async (req, res) => {
   const {user} = req.session;
   const {id} = req.params;
   const {error} = req.query;
