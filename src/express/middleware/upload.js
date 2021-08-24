@@ -3,11 +3,9 @@
 const multer = require(`multer`);
 const path = require(`path`);
 const {nanoid} = require(`nanoid`);
-const {MAX_FILE_SIZE, ALLOWED_TYPES, MULTER_ERRORS} = require(`../../constants`);
+const {MAX_FILE_SIZE, ALLOWED_TYPES, MULTER_ERRORS, MULTER_UPLOAD_DIR} = require(`../../constants`);
 
-const UPLOAD_DIR = `../upload/img/`;
-
-const uploadDirAbsolute = path.resolve(__dirname, UPLOAD_DIR);
+const uploadDirAbsolute = path.resolve(__dirname, MULTER_UPLOAD_DIR);
 
 const storage = multer.diskStorage({
   destination: uploadDirAbsolute,
