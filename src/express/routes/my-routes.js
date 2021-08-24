@@ -10,6 +10,7 @@ const {ARTICLES_PER_PAGE} = require(`../../constants`);
 const myRouter = new Router();
 
 myRouter.get(`/`, async (req, res) => {
+  const {user} = req.session;
   let {page = 1} = req.query;
   page = +page;
 
@@ -25,13 +26,21 @@ myRouter.get(`/`, async (req, res) => {
     DateTimeFormat,
     page,
     totalPages,
+    user
   });
 });
 
 myRouter.get(`/comments`, async (req, res) => {
+  const {user} = req.session;
   const articles = await api.getArticles({comments: true});
   const sortedByDateComments = await getSortedByDateComments(articles);
-  res.render(`comments`, {sortedByDateComments, articles, title: `Комментарии`, DateTimeFormat});
+  res.render(`comments`, {
+    sortedByDateComments,
+    articles,
+    title: `Комментарии`,
+    DateTimeFormat,
+    user
+  });
 });
 
 module.exports = myRouter;

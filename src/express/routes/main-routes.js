@@ -16,6 +16,7 @@ const logger = getLogger({
 });
 
 mainRouter.get(`/`, async (req, res) => {
+  const {user} = req.session;
   let {page = 1} = req.query;
   page = +page;
 
@@ -43,6 +44,7 @@ mainRouter.get(`/`, async (req, res) => {
       categories,
       page,
       totalPages,
+      user
     });
   } catch (error) {
     logger.error(error.message);
@@ -51,8 +53,9 @@ mainRouter.get(`/`, async (req, res) => {
 });
 
 mainRouter.get(`/register`, (req, res) => {
+  const {user} = req.session;
   const {error} = req.query;
-  res.render(`registration`, {errors: error && error.split(`,`)});
+  res.render(`registration`, {errors: error && error.split(`,`), user});
 });
 
 mainRouter.post(`/register`, upload.single(`avatar`), async (req, res) => {
@@ -75,8 +78,9 @@ mainRouter.post(`/register`, upload.single(`avatar`), async (req, res) => {
 });
 
 mainRouter.get(`/login`, (req, res) => {
+  const {user} = req.session;
   const {error} = req.query;
-  res.render(`login`, {error});
+  res.render(`login`, {error, user});
 });
 
 mainRouter.post(`/login`, async (req, res) => {
