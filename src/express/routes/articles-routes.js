@@ -2,6 +2,7 @@
 
 const {Router} = require(`express`);
 const {DateTimeFormat} = require(`intl`);
+const csrf = require(`csurf`);
 
 const {getLogger} = require(`../../lib/logger`);
 const {ensureArray} = require(`../../utils`);
@@ -16,7 +17,9 @@ const logger = getLogger({
   name: `articles-routes`,
 });
 
-articlesRouter.get(`/add`, auth, async (req, res) => {
+const csrfProtection = csrf();
+
+articlesRouter.get(`/add`, auth, csrfProtection, async (req, res) => {
   const {user} = req.session;
   const {error} = req.query;
   const categories = await api.getCategories();
@@ -25,11 +28,12 @@ articlesRouter.get(`/add`, auth, async (req, res) => {
     title: `Публикация`,
     categories,
     error,
-    user
+    user,
+    csrfToken: req.csrfToken()
   });
 });
 
-articlesRouter.post(`/add`, upload.single(`file-picture`), async (req, res) => {
+articlesRouter.post(`/add`, upload.single(`file-picture`), csrfProtection, async (req, res) => {
   const {user} = req.session;
   const {body, file} = req;
   const articleData = {
@@ -85,7 +89,7 @@ articlesRouter.get(`/category/:id`, async (req, res) => {
   });
 });
 
-articlesRouter.get(`/:id`, async (req, res) => {
+articlesRouter.get(`/:id`, csrfProtection, async (req, res) => {
   const {user} = req.session;
   const {id} = req.params;
   const {error} = req.query;
@@ -105,14 +109,15 @@ articlesRouter.get(`/:id`, async (req, res) => {
       title: `Пост`,
       sortedComments,
       error,
-      user
+      user,
+      csrfToken: req.csrfToken()
     });
   } catch (err) {
     res.status(err.response.status).render(`errors/404`, {title: `Страница не найдена`});
   }
 });
 
-articlesRouter.get(`/edit/:id`, auth, async (req, res) => {
+articlesRouter.get(`/edit/:id`, auth, csrfProtection, async (req, res) => {
   const {user} = req.session;
   const {id} = req.params;
   const {error} = req.query;
@@ -130,14 +135,15 @@ articlesRouter.get(`/edit/:id`, auth, async (req, res) => {
       id,
       title: `Публикация`,
       error,
-      user
+      user,
+      csrfToken: req.csrfToken()
     });
   } catch (err) {
     res.status(err.response.status).render(`errors/404`, {title: `Страница не найдена`});
   }
 });
 
-articlesRouter.post(`/edit/:id`, upload.single(`file-picture`), async (req, res) => {
+articlesRouter.post(`/edit/:id`, upload.single(`file-picture`), csrfProtection, async (req, res) => {
   const {user} = req.session;
   const {body, file} = req;
   const {id} = req.params;
@@ -159,7 +165,7 @@ articlesRouter.post(`/edit/:id`, upload.single(`file-picture`), async (req, res)
   }
 });
 
-articlesRouter.post(`/:id/comments`, upload.single(`text`), async (req, res) => {
+articlesRouter.post(`/:id/comments`, upload.single(`text`), csrfProtection, async (req, res) => {
   const {user} = req.session;
   const {id} = req.params;
   const {text} = req.body;
