@@ -6,13 +6,19 @@ block content
       a.header__logo.logo(href='/')
         img.logo__image(src='/img/icons/logo-image-only.svg' alt='логотип Тайпотеки')
         span.logo__name Типотека
-      nav.header__nav
+      if user
+        nav.header__nav
         ul.header__nav-list
           li.header__list-item
-            a.header__popup(href='/register') Регистрация
+            p Алёна Фролова
           li.header__list-item
-            a.header__enter(href='/login') Вход с паролем
-      a.header__search.button.button--search(href='/search' aria-label='Поиск по сайту')
+            a.header__exit(href='#') Выйти
+        a.header__avatar.avatar
+          img(src='/img/avatar-2.png' alt='аватар пользователя')
+      else
+        a.header__registration(href='/register') Регистрация
+        a.header__enter(href='/login') Вход с паролем
+      a.header__search.button.button--search(href='/search' aria-label='поиск по сайту')
     main
       h1.visually-hidden Регистрация пользователя
       section

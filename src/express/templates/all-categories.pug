@@ -21,11 +21,11 @@ block content
               span.visually-hidden Добавить категорию
             button.category__button.button.button--category(type='submit') Добавить
         ul.category__list
-          each category, index in categories
+          each category in categories
             li.category__list-item
               form(action='#' method='POST')
-                input(id=('modify-form-category-' + index) type='text' name=('category-' + index) value= category.title)
-                label(for='modify-form-category-' + index)
+                input(id=('modify-form-category-' + category.id) type='text' name=('category-' + category.id) value= category.title)
+                label(for='modify-form-category-' + category.id)
                   span.visually-hidden Редактировать категорию
                 button.category__button.button.button--category(type='submit') Сохранить
                 button.category__button.button.button--category(type='button') Удалить
