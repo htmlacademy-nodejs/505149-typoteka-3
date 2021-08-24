@@ -20,13 +20,14 @@ block content
           a.popup__button.button.button--popup-close(aria-label='Закрыть окно') Закрыть окно
           h2.popup__title Войти
           .popup__form.form.form--log-in
-            form(action='#' method='get')
+            form(action='/login' method='post')
               .form__field
                 label
-                  input(type='email' placeholder='Электронная почта' required)
+                  input(type='email' name='user-email' placeholder='Электронная почта' required)
               .form__field
                 label
-                  input(type='password' placeholder='Пароль' required)
-              p.form__error-message Некоторая ошибка произошла, беда!
+                  input(type='password' name='user-password' placeholder='Пароль' required)
+              if error
+                p.form__error-message #{error}
               button.form__submit-btn.form__submit-btn--log-in.button.button--colored(type='submit') Войти
     include partials/footer.pug
