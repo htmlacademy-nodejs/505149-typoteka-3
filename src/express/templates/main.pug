@@ -51,8 +51,8 @@ block content
           ul.last__list
             each comment in sortedByDateComments
               li.last__list-item
-                img.last__list-image(src='/img/avatar-small-1.png' width='20' height='20' alt='Аватар пользователя')
-                b.last__list-name Анна Артамонова
+                img.last__list-image(src=`/img/${comment.users.avatar}` width='20' height='20' alt='Аватар пользователя')
+                b.last__list-name #{comment.users.firstName + ' ' + comment.users.lastName}
                 a.last__list-link(href=`/articles/${comment[`articleId`]}`)= comment.text
       section.main-page__list.preview
         h2.visually-hidden Список превью статей

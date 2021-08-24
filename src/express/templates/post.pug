@@ -49,17 +49,17 @@ block content
               each comment in sortedComments
                 li.comments__comment
                   .comments__avatar.avatar
-                    img(src='/img/avatar-1.png' alt='аватар пользователя')
+                    img.img-header-avatar(src=`/img/${comment.users.avatar}` alt='Аватар пользователя')
                   .comments__text
                     .comments__head
-                      p Евгений Петров •
+                      p #{comment.users.firstName + ' ' + comment.users.lastName} •
                       time.comments__date(datetime=comment[`created_date`])
                         +time(new Date(comment[`created_date`]))
                     p.comments__message= comment.text
             .comments__footer.comments__footer--user
               form(action=`/articles/${id}/comments` method='POST', enctype='multipart/form-data')
                 .comments__avatar.avatar
-                  img(src='/img/avatar-2.png' alt='аватар пользователя')
+                  img.img-header-avatar(src=`/img/${user.avatar}` alt='аватар пользователя')
                 label
                   +errorMessage(error)
                   textarea(rows='1' name='text' placeholder='Присоединиться к обсуждению' minlength='20')

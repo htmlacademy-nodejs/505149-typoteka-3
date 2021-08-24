@@ -18,8 +18,8 @@ block content
           each comment in sortedByDateComments
             li.publication__list-item
               .publication__header
-                img.publication__list-image(src='/img/avatar-small-2.png' width='20' height='20' alt='Аватар пользователя')
-                b.publication__list-name Александр Петров
+                img.publication__list-image(src=`/img/${comment.users.avatar}` width='20' height='20' alt='Аватар пользователя')
+                b.publication__list-name #{comment.users.firstName + ' ' + comment.users.lastName}
                 time.publication__item-time(datetime=comment[`created_date`])
                   +time(new Date(comment[`created_date`]))
               p.publication__item-text= comment.text
