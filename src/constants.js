@@ -1,5 +1,7 @@
 'use strict';
 
+const path = require(`path`);
+
 module.exports.DEFAULT_COMMAND = `--help`;
 module.exports.MAX_DATA_COUNT = 1000;
 module.exports.USER_ARGV_INDEX = 2;
@@ -9,7 +11,7 @@ module.exports.MAX_COMMENTS = 4;
 module.exports.FILE_NAME = `mocks.json`;
 module.exports.PUBLIC_DIR = `files`;
 module.exports.UPLOAD_DIR = `upload`;
-module.exports.MULTER_UPLOAD_DIR = `../upload/img/`;
+module.exports.MULTER_UPLOAD_DIR = path.resolve(__dirname, `express/upload/img/`);
 module.exports.TIMEOUT = 1000;
 module.exports.TXT_FILES_DIR = `./data/`;
 module.exports.ARTICLES_PER_PAGE = 8;
