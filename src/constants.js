@@ -34,6 +34,12 @@ module.exports.RegisterMessage = {
   EMPTY_VALUE_IMAGE: `No "image" received or invalid file type`,
   WRONG_EMAIL: `Email is incorrect`,
   WRONG_PASSWORD: `Password is incorrect`,
+  EMPTY_FIELD: `One or more fields are empty, please fill all fields`,
+};
+
+module.exports.EmptySearchMessage = {
+  NOTHING_FOUND: `Nothing was found`,
+  EMPTY_SEARCH_QUERY: `There was an empty query`
 };
 
 module.exports.ExitCode = {

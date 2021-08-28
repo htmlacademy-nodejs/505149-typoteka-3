@@ -5,7 +5,7 @@ const {DateTimeFormat} = require(`intl`);
 
 const api = require(`../api`).getAPI();
 const {getLogger} = require(`../../lib/logger`);
-const {ARTICLES_PER_PAGE} = require(`../../constants`);
+const {ARTICLES_PER_PAGE, EmptySearchMessage} = require(`../../constants`);
 
 const searchRouter = new Router();
 
@@ -26,9 +26,9 @@ searchRouter.get(`/results`, async (req, res) => {
 
   if (!query) {
     return res.render(`search-empty`, {
-      title: `Ничего не найдено`,
+      title: EmptySearchMessage.NOTHING_FOUND,
       query,
-      message: `Пустой запрос`,
+      message: EmptySearchMessage.EMPTY_SEARCH_QUERY,
       user
     });
   }
@@ -55,9 +55,9 @@ searchRouter.get(`/results`, async (req, res) => {
       });
     } else {
       return res.render(`search-empty`, {
-        title: `Ничего не найдено`,
+        title: EmptySearchMessage.NOTHING_FOUND,
         query,
-        message: `Ничего не найдено`,
+        message: EmptySearchMessage.NOTHING_FOUND,
         user
       });
     }
