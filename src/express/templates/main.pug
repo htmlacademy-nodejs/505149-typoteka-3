@@ -1,17 +1,23 @@
 extends layout.pug
 
 block content
-  div.wrapper
+  .wrapper
     header.header
       a.header__logo.logo(href='/')
         img.logo__image(src='/img/icons/logo-image-only.svg' alt='логотип Тайпотеки')
         span.logo__name Типотека
-      nav.header__nav
+      if user
+        nav.header__nav
         ul.header__nav-list
           li.header__list-item
-            a.header__registration(href='/register') Регистрация
+            p #{user.firstName + ' ' + user.lastName}
           li.header__list-item
-            a.header__enter(href='/login') Вход с паролем
+            a.header__exit(href='/logout') Выйти
+        a.header__avatar.avatar
+          img.img-header-avatar(src=`/img/${user.avatar}` alt='аватар пользователя')
+      else
+        a.header__registration(href='/register') Регистрация
+        a.header__enter(href='/login') Вход с паролем
       a.header__search.button.button--search(href='/search' aria-label='поиск по сайту')
     main.main-page
       h1.visually-hidden Главная страница личного блога Типотека
@@ -45,8 +51,8 @@ block content
           ul.last__list
             each comment in sortedByDateComments
               li.last__list-item
-                img.last__list-image(src='/img/avatar-small-1.png' width='20' height='20' alt='Аватар пользователя')
-                b.last__list-name Анна Артамонова
+                img.last__list-image(src=`/img/${comment.users.avatar}` width='20' height='20' alt='Аватар пользователя')
+                b.last__list-name #{comment.users.firstName + ' ' + comment.users.lastName}
                 a.last__list-link(href=`/articles/${comment[`articleId`]}`)= comment.text
       section.main-page__list.preview
         h2.visually-hidden Список превью статей
@@ -70,4 +76,3 @@ block content
                 |
                 b.preview__comment-count= article.comments.length
     +pagination(page, totalPages, 2, `?`)
-    include partials/footer.pug

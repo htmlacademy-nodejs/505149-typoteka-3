@@ -6,10 +6,18 @@ block content
       a.header__logo.logo(href='/')
         img.logo__image(src='/img/icons/logo-image-only.svg' alt='логотип Тайпотеки')
         span.logo__name Типотека
-      button.button.button--colored.header__button-new Новая запись
-      .header__dropdown
-        a.button.button--burger.header__burger(href='#') Открыть меню
-        include ./partials/burger.pug
+      if user
+        nav.header__nav
+        ul.header__nav-list
+          li.header__list-item
+            p #{user.firstName + ' ' + user.lastName}
+          li.header__list-item
+            a.header__exit(href='/logout') Выйти
+        a.header__avatar.avatar
+          img.img-header-avatar(src=`/img/${user.avatar}` alt='аватар пользователя')
+      else
+        a.header__registration(href='/register') Регистрация
+        a.header__enter(href='/login') Вход с паролем
       a.header__search.button.button--search(href='/search' aria-label='поиск по сайту')
     main
       section.search-page
@@ -21,4 +29,3 @@ block content
                 input(type='search' name='query' placeholder='Что ищем?' value= query)
               button.search__button.button.button--transparent(type='submit') Найти
           p.search-page__empty= message
-    include partials/footer.pug

@@ -5,7 +5,7 @@ const {DateTimeFormat} = require(`intl`);
 
 const api = require(`../api`).getAPI();
 const {getLogger} = require(`../../lib/logger`);
-const {ARTICLES_PER_PAGE} = require(`../../constants`);
+const {ARTICLES_PER_PAGE, EmptySearchMessage} = require(`../../constants`);
 
 const searchRouter = new Router();
 
@@ -13,15 +13,24 @@ const logger = getLogger({
   name: `search-routes`,
 });
 
-searchRouter.get(`/`, async (req, res) => res.render(`search`, {title: `Поиск`}));
+searchRouter.get(`/`, async (req, res) => {
+  const {user} = req.session;
+  res.render(`search`, {title: `Поиск`, user});
+});
 
 searchRouter.get(`/results`, async (req, res) => {
+  const {user} = req.session;
   let {page = 1} = req.query;
   const query = req.query.query;
   page = +page;
 
   if (!query) {
-    return res.render(`search-empty`, {title: `Ничего не найдено`, query, message: `Пустой запрос`});
+    return res.render(`search-empty`, {
+      title: EmptySearchMessage.NOTHING_FOUND,
+      query,
+      message: EmptySearchMessage.EMPTY_SEARCH_QUERY,
+      user
+    });
   }
 
   const limit = ARTICLES_PER_PAGE;
@@ -41,10 +50,16 @@ searchRouter.get(`/results`, async (req, res) => {
         page,
         totalPages,
         query,
-        DateTimeFormat
+        DateTimeFormat,
+        user
       });
     } else {
-      return res.render(`search-empty`, {title: `Ничего не найдено`, query, message: `Ничего не найдено`});
+      return res.render(`search-empty`, {
+        title: EmptySearchMessage.NOTHING_FOUND,
+        query,
+        message: EmptySearchMessage.NOTHING_FOUND,
+        user
+      });
     }
   } catch (error) {
     logger.error(error.message);

@@ -99,3 +99,61 @@ describe(`User API end-points:`, () => {
       .expect(HttpCode.BAD_REQUEST);
   });
 });
+
+describe(`API authenticate user:`, () => {
+  let res;
+
+  const validUserData = {
+    firstName: `Сидор`,
+    lastName: `Сидоров`,
+    email: `sidorov@example.com`,
+    password: `sidorov`,
+    passwordRepeated: `sidorov`,
+    avatar: `sidorov.jpg`
+  };
+
+  const validAuthData = {
+    email: `sidorov@example.com`,
+    password: `sidorov`
+  };
+
+  test(`if data is valid, status code is 200 and user name is correct`, async () => {
+    await request(app)
+      .post(`/api/user`)
+      .send(validUserData);
+
+    res = await request(app)
+      .post(`/api/user/auth`)
+      .send(validAuthData);
+
+    expect(res.statusCode).toBe(HttpCode.OK);
+    expect(res.body.firstName + ` ` + res.body.lastName).toBe(`Сидор Сидоров`);
+  });
+
+  test(`If email is incorrect, status is 401`, async () => {
+    const badAuthData = {
+      email: `not-exist@example.com`,
+      password: `sidorov`
+    };
+
+    res = await request(app)
+      .post(`/api/user/auth`)
+      .send(badAuthData)
+      .expect(HttpCode.UNAUTHORIZED);
+  });
+
+  test(`If password doesn't match, status is 401`, async () => {
+    const badAuthData = {
+      email: `sidorov@example.com`,
+      password: `ivanov`
+    };
+    await request(app)
+      .post(`/api/user/auth`)
+      .send(badAuthData)
+      .expect(HttpCode.UNAUTHORIZED);
+
+    await sequelize.models.user.destroy({
+      where: {email: validUserData.email}
+    });
+  });
+});

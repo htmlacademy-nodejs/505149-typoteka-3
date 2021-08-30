@@ -6,13 +6,19 @@ block content
       a.header__logo.logo(href='/')
         img.logo__image(src='/img/icons/logo-image-only.svg' alt='логотип Тайпотеки')
         span.logo__name Типотека
-      nav.header__nav
+      if user
+        nav.header__nav
         ul.header__nav-list
           li.header__list-item
-            a.header__popup(href='/register') Регистрация
+            p #{user.firstName + ' ' + user.lastName}
           li.header__list-item
-            a.header__enter(href='/login') Вход с паролем
-      a.header__search.button.button--search(href='/search' aria-label='Поиск по сайту')
+            a.header__exit(href='/logout') Выйти
+        a.header__avatar.avatar
+          img.img-header-avatar(src=`/img/${user.avatar}` alt='аватар пользователя')
+      else
+        a.header__registration(href='/register') Регистрация
+        a.header__enter(href='/login') Вход с паролем
+      a.header__search.button.button--search(href='/search' aria-label='поиск по сайту')
     main
       h1.visually-hidden Регистрация пользователя
       section
@@ -49,4 +55,3 @@ block content
                   input.visually-hidden(type='file' name='avatar')
                 | Загрузить фото профиля
               button.form__submit-btn.form__submit-btn--register.button.button--colored(type='submit') Зарегистрироваться
-    include partials/footer.pug

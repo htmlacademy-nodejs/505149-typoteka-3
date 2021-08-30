@@ -22,6 +22,7 @@ block content
                   h3 Дата публикации
                   .new-publication__date-form-division
                     .new-publication__date-block
+                      input(type='hidden' name='_csrf' value=`${csrfToken}`)
                       label(for='new-publication-date' aria-label='Календарь')
                       input#new-publication-date(type='text' name='created_date' value=(article && article[`created_date`] ? `${new DateTimeFormat(`ru-Ru`, {day: `numeric`, month: `numeric`, year: `numeric`}).format(new Date(article[`created_date`]))}` : '') placeholder= (article && article[`created_date`] ? `${new DateTimeFormat(`ru-Ru`, {day: `numeric`, month: `numeric`, year: `numeric`}).format(new Date(article[`created_date`]))}` : `${new DateTimeFormat(`ru-Ru`, {day: `numeric`, month: `numeric`, year: `numeric`}).format(new Date())}`))
                 button.new-publication__button.button.button--colored(type='submit') Опубликовать
@@ -56,4 +57,3 @@ block content
                     label
                       textarea(rows='10' name='fulltext' placeholder='Полный текст публикации')
                         | #{article && article.fulltext ? article.fulltext : ''}
-    include partials/footer.pug

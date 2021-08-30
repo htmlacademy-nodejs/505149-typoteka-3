@@ -4,10 +4,9 @@ block content
   .wrapper-color
     header.header.header--error
       a.header__logo.header__logo--404.logo(href='/')
-        img(src='/img/icons/logo.svg' alt='Логотип Тайпотеки')
-      a.header__registration(href='/register') Регистрация
-      a.header__enter(href='/login') Вход с паролем
-      a.header__search.button.button--search(href='/search' aria-label='Поиск по сайту')
+        img.logo__image(src='/img/icons/logo-image-only.svg' alt='логотип Тайпотеки')
+        span.logo__name Типотека
+      a.header__search.button.button--search(href='/search' aria-label='поиск по сайту')
     main
       h1.visually-hidden Ошибка 404
       section.error

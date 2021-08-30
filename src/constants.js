@@ -1,5 +1,7 @@
 'use strict';
 
+const path = require(`path`);
+
 module.exports.DEFAULT_COMMAND = `--help`;
 module.exports.MAX_DATA_COUNT = 1000;
 module.exports.USER_ARGV_INDEX = 2;
@@ -9,6 +11,7 @@ module.exports.MAX_COMMENTS = 4;
 module.exports.FILE_NAME = `mocks.json`;
 module.exports.PUBLIC_DIR = `files`;
 module.exports.UPLOAD_DIR = `upload`;
+module.exports.MULTER_UPLOAD_DIR = path.resolve(__dirname, `express/upload/img/`);
 module.exports.TIMEOUT = 1000;
 module.exports.TXT_FILES_DIR = `./data/`;
 module.exports.ARTICLES_PER_PAGE = 8;
@@ -29,6 +32,14 @@ module.exports.RegisterMessage = {
   PASSWORDS_NOT_EQUALS: `Passwords do not match`,
   EMPTY_VALUE: `Empty value is not permitted`,
   EMPTY_VALUE_IMAGE: `No "image" received or invalid file type`,
+  WRONG_EMAIL: `Email is incorrect`,
+  WRONG_PASSWORD: `Password is incorrect`,
+  EMPTY_FIELD: `One or more fields are empty, please fill all fields`,
+};
+
+module.exports.EmptySearchMessage = {
+  NOTHING_FOUND: `Nothing was found`,
+  EMPTY_SEARCH_QUERY: `There was an empty query`
 };
 
 module.exports.ExitCode = {

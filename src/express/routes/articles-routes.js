@@ -2,11 +2,13 @@
 
 const {Router} = require(`express`);
 const {DateTimeFormat} = require(`intl`);
+const csrf = require(`csurf`);
 
 const {getLogger} = require(`../../lib/logger`);
 const {ensureArray} = require(`../../utils`);
 const api = require(`../api`).getAPI();
 const upload = require(`../middleware/upload`);
+const auth = require(`../middleware/auth`);
 const {ARTICLES_PER_PAGE} = require(`../../constants`);
 
 const articlesRouter = new Router();
@@ -15,13 +17,24 @@ const logger = getLogger({
   name: `articles-routes`,
 });
 
-articlesRouter.get(`/add`, async (req, res) => {
+const csrfProtection = csrf();
+
+articlesRouter.get(`/add`, auth, csrfProtection, async (req, res) => {
+  const {user} = req.session;
   const {error} = req.query;
   const categories = await api.getCategories();
-  res.render(`new-post`, {DateTimeFormat, title: `Публикация`, categories, error});
+  res.render(`new-post`, {
+    DateTimeFormat,
+    title: `Публикация`,
+    categories,
+    error,
+    user,
+    csrfToken: req.csrfToken()
+  });
 });
 
-articlesRouter.post(`/add`, upload.single(`file-picture`), async (req, res) => {
+articlesRouter.post(`/add`, upload.single(`file-picture`), csrfProtection, async (req, res) => {
+  const {user} = req.session;
   const {body, file} = req;
   const articleData = {
     picture: file ? file.filename : res.redirect(`/articles/add?error=There is no file was selected.`),
@@ -29,8 +42,7 @@ articlesRouter.post(`/add`, upload.single(`file-picture`), async (req, res) => {
     fulltext: body.fulltext,
     title: body[`title`],
     categories: ensureArray(body.category),
-    // TODO: после внедрения user
-    userId: 2
+    userId: user.id
   };
 
   try {
@@ -42,13 +54,15 @@ articlesRouter.post(`/add`, upload.single(`file-picture`), async (req, res) => {
   }
 });
 
-articlesRouter.get(`/categories`, async (req, res) => {
+articlesRouter.get(`/categories`, auth, async (req, res) => {
+  const {user} = req.session;
   const categories = await api.getCategories(false);
 
-  res.render(`all-categories`, {title: `Категории`, categories});
+  res.render(`all-categories`, {title: `Категории`, categories, user});
 });
 
 articlesRouter.get(`/category/:id`, async (req, res) => {
+  const {user} = req.session;
   const {id} = req.params;
   let {page = 1} = req.query;
   page = +page;
@@ -70,11 +84,13 @@ articlesRouter.get(`/category/:id`, async (req, res) => {
     id,
     DateTimeFormat,
     page,
-    totalPages
+    totalPages,
+    user
   });
 });
 
-articlesRouter.get(`/:id`, async (req, res) => {
+articlesRouter.get(`/:id`, csrfProtection, async (req, res) => {
+  const {user} = req.session;
   const {id} = req.params;
   const {error} = req.query;
 
@@ -85,13 +101,24 @@ articlesRouter.get(`/:id`, async (req, res) => {
     ]);
 
     const sortedComments = article.comments.slice().sort((a, b) => (new Date(b[`created_date`])) - (new Date(a[`created_date`])));
-    res.render(`post`, {DateTimeFormat, categories, article, id, title: `Пост`, sortedComments, error});
+    res.render(`post`, {
+      DateTimeFormat,
+      categories,
+      article,
+      id,
+      title: `Пост`,
+      sortedComments,
+      error,
+      user,
+      csrfToken: req.csrfToken()
+    });
   } catch (err) {
     res.status(err.response.status).render(`errors/404`, {title: `Страница не найдена`});
   }
 });
 
-articlesRouter.get(`/edit/:id`, async (req, res) => {
+articlesRouter.get(`/edit/:id`, auth, csrfProtection, async (req, res) => {
+  const {user} = req.session;
   const {id} = req.params;
   const {error} = req.query;
 
@@ -107,14 +134,17 @@ articlesRouter.get(`/edit/:id`, async (req, res) => {
       categories,
       id,
       title: `Публикация`,
-      error
+      error,
+      user,
+      csrfToken: req.csrfToken()
     });
   } catch (err) {
     res.status(err.response.status).render(`errors/404`, {title: `Страница не найдена`});
   }
 });
 
-articlesRouter.post(`/edit/:id`, upload.single(`file-picture`), async (req, res) => {
+articlesRouter.post(`/edit/:id`, upload.single(`file-picture`), csrfProtection, async (req, res) => {
+  const {user} = req.session;
   const {body, file} = req;
   const {id} = req.params;
   const articleData = {
@@ -123,8 +153,7 @@ articlesRouter.post(`/edit/:id`, upload.single(`file-picture`), async (req, res)
     fulltext: body.fulltext,
     title: body[`title`],
     categories: ensureArray(body.category),
-    // TODO: после внедрения user
-    userId: 1
+    userId: user.id
   };
 
   try {
@@ -136,17 +165,13 @@ articlesRouter.post(`/edit/:id`, upload.single(`file-picture`), async (req, res)
   }
 });
 
-articlesRouter.post(`/:id/comments`, upload.single(`text`), async (req, res) => {
+articlesRouter.post(`/:id/comments`, upload.single(`text`), csrfProtection, async (req, res) => {
+  const {user} = req.session;
   const {id} = req.params;
   const {text} = req.body;
 
-  // TODO: нужно будет поправить после внедрения user
-  let comment = {};
-  comment.userId = 1;
-  comment.text = text;
-
   try {
-    await api.createComment(id, comment);
+    await api.createComment(id, {userId: user.id, text});
     res.redirect(`/articles/${id}`);
   } catch (error) {
     logger.error(error.message);

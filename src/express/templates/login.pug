@@ -6,12 +6,18 @@ block content
       a.header__logo.logo(href='/')
         img.logo__image(src='/img/icons/logo-image-only.svg' alt='логотип Тайпотеки')
         span.logo__name Типотека
-      nav.header__nav
+      if user
+        nav.header__nav
         ul.header__nav-list
           li.header__list-item
-            a.header__popup(href='/register') Регистрация
+            p #{user.firstName + ' ' + user.lastName}
           li.header__list-item
-            a.header__enter(href='/login') Вход с паролем
+            a.header__exit(href='/logout') Выйти
+        a.header__avatar.avatar
+          img.img-header-avatar(src=`/img/${user.avatar}` alt='аватар пользователя')
+      else
+        a.header__registration(href='/register') Регистрация
+        a.header__enter(href='/login') Вход с паролем
       a.header__search.button.button--search(href='/search' aria-label='Поиск по сайту')
     main
       h1.visually-hidden Вход пользователя
@@ -20,13 +26,13 @@ block content
           a.popup__button.button.button--popup-close(aria-label='Закрыть окно') Закрыть окно
           h2.popup__title Войти
           .popup__form.form.form--log-in
-            form(action='#' method='get')
+            form(action='/login' method='post')
               .form__field
                 label
-                  input(type='email' placeholder='Электронная почта' required)
+                  input(type='email' name='user-email' placeholder='Электронная почта' required)
               .form__field
                 label
-                  input(type='password' placeholder='Пароль' required)
-              p.form__error-message Некоторая ошибка произошла, беда!
+                  input(type='password' name='user-password' placeholder='Пароль' required)
+              if error
+                p.form__error-message #{error}
               button.form__submit-btn.form__submit-btn--log-in.button.button--colored(type='submit') Войти
-    include partials/footer.pug

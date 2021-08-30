@@ -4,9 +4,20 @@ block content
   .wrapper
     header.header
       a.header__logo.logo(href='/')
-        img(src='/img/icons/logo.svg' alt='логотип Тайпотеки')
-      a.header__registration(href='/register') Регистрация
-      a.header__enter(href='/login') Вход с паролем
+        img.logo__image(src='/img/icons/logo-image-only.svg' alt='логотип Тайпотеки')
+        span.logo__name Типотека
+      if user
+        nav.header__nav
+        ul.header__nav-list
+          li.header__list-item
+            p #{user.firstName + ' ' + user.lastName}
+          li.header__list-item
+            a.header__exit(href='/logout') Выйти
+        a.header__avatar.avatar
+          img.img-header-avatar(src=`/img/${user.avatar}` alt='аватар пользователя')
+      else
+        a.header__registration(href='/register') Регистрация
+        a.header__enter(href='/login') Вход с паролем
       a.header__search.button.button--search(href='/search' aria-label='поиск по сайту')
     main.articles-category
       h1= categories.find((it) => it.id === +id).title
@@ -40,4 +51,3 @@ block content
                 |
                 b.preview__comment-count= article.comments.length
     +pagination(page, totalPages, 2, `?`)
-    include partials/footer.pug
